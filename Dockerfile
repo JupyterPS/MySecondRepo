@@ -3,16 +3,12 @@ FROM jupyter/minimal-notebook:latest
 # Install .NET CLI dependencies
 
 ARG NB_USER=jovyan
-ARG NB_UID=1000
+ARG NB_UID=1000https://github.com/JupyterPS/TheNewTemplate/settings
 ENV USER ${NB_USER}
 ENV NB_UID ${NB_UID}
 ENV HOME /home/${NB_USER}
 
 WORKDIR ${HOME}
-
-RUN jupyter labextension install @jupyterlab/toc
-
-RUN jupyter lab build 
 
 # Use root to install .NET
 USER root
