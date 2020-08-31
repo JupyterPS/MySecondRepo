@@ -86,8 +86,6 @@ ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
 # INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE
 
-RUN jupyter lab build
-
 USER root
 
 # Install kubectl
