@@ -10,6 +10,10 @@ ENV HOME /home/${NB_USER}
 
 WORKDIR ${HOME}
 
+RUN jupyter labextension install @jupyterlab/toc
+
+RUN jupyter lab build 
+
 # Use root to install .NET
 USER root
 
