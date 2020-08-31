@@ -1,5 +1,5 @@
 FROM jupyter/minimal-notebook:latest
-
+ 
 # Install .NET CLI dependencies
 
 ARG NB_USER=jovyan
