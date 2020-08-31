@@ -92,7 +92,7 @@ ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 # INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE
 
 # RUN jupyter labextension install @jupyterlab/toc  
-RUN jupyter serverextension enable --py jupyterlab_git --force
+RUN jupyter serverextension enable --py jupyterlab_git 
 
 RUN jupyter lab build --force
 
