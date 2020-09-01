@@ -14,7 +14,22 @@ COPY requirements.txt ./requirements.txt
 RUN python -m pip  install -r requirements.txt
 RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 
-RUN jupyter labextension install @jupyterlab/toc  
+ 
+RUN conda install -c conda-forge nodejs
+# Activate jlab extensions
+RUN jupyter labextension install @jupyterlab/toc  --no-build
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build
+RUN jupyter labextension install plotlywidget@1.5.2 --no-build
+RUN jupyter labextension install jupyterlab-plotly@1.5.2 --no-build
+ 
+
+
+
+
+
+
+
+# RUN jupyter labextension install @jupyterlab/toc  
 RUN jupyter serverextension enable --py jupyterlab_git 
 RUN jupyter lab build  
  
