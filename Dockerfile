@@ -95,6 +95,8 @@ ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 RUN jupyter serverextension enable --py jupyterlab_git 
 
 # RUN jupyter lab build --dev-build=false --minimize=false
+RUN jupyter-nbextension install --user toc
+RUN jupyter-nbextension enable toc/toc
 RUN jupyter lab build  
 
 USER root
