@@ -90,13 +90,14 @@ ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 # FROM dotnet/interactive:latest
 
 # INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE
+RUN pip3 install --user jupyter_contrib_nbextensions
+RUN jupyter contrib nbextension install --user
+RUN jupyter nbextension enable toc2/main 
 
 # RUN jupyter labextension install @jupyterlab/toc  
 RUN jupyter serverextension enable --py jupyterlab_git 
 
 # RUN jupyter lab build --dev-build=false --minimize=false
-RUN jupyter-nbextension install --user toc
-RUN jupyter-nbextension enable toc/toc
 RUN jupyter lab build  
 
 USER root
