@@ -14,6 +14,12 @@ RUN python -m pip install --upgrade pip
 COPY requirements.txt ./requirements.txt
 RUN python -m pip  install -r requirements.txt
 RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
+
+RUN jupyter labextension install @jupyterlab/toc  
+RUN jupyter serverextension enable --py jupyterlab_git 
+
+# RUN jupyter lab build --dev-build=false --minimize=false
+RUN jupyter lab build  
  
 # Use root to install .NET
 USER root
@@ -90,12 +96,7 @@ ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 # FROM dotnet/interactive:latest
 
 # INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE
-RUN jupyter labextension install @jupyterlab/toc  
-RUN jupyter serverextension enable --py jupyterlab_git 
-
-# RUN jupyter lab build --dev-build=false --minimize=false
-RUN jupyter lab build  
-
+ 
 USER root
 
 # Install kubectl
