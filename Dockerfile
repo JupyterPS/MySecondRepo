@@ -18,7 +18,7 @@ RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 RUN conda install -c conda-forge nodejs
 # Activate jlab extensions
 RUN jupyter labextension install @jupyterlab/toc  --no-build
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build 
+ 
  
  
 
