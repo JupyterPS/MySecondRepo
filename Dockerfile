@@ -95,7 +95,7 @@ RUN jupyter labextension install @jupyterlab/toc
 RUN jupyter serverextension enable --py jupyterlab_git 
 
 RUN jupyter lab build --dev-build=false --minimize=false
-RUN jupyter lab build  
+# RUN jupyter lab build  
 
 USER root
 
