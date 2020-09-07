@@ -3,7 +3,7 @@ FROM jupyter/minimal-notebook:latest
 # Install .NET CLI dependencies
 
 ARG NB_USER=jovyan
-ARG NB_UID=1000https://github.com/JupyterPS/TheNewTemplate/settings
+ARG NB_UID=1000https://github.com/JupyterPS/MySecondRepo/settings
 ENV USER ${NB_USER}
 ENV NB_UID ${NB_UID}
 ENV HOME /home/${NB_USER}
