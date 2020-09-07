@@ -10,14 +10,14 @@ ENV HOME /home/${NB_USER}
 
 WORKDIR ${HOME}
 
-# RUN python -m pip install --upgrade pip
-# COPY requirements.txt ./requirements.txt
-# RUN python -m pip  install -r requirements.txt
-# RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
+RUN python -m pip install --upgrade pip
+COPY requirements.txt ./requirements.txt
+RUN python -m pip  install -r requirements.txt
+RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 
-# RUN jupyter labextension install @jupyterlab/toc  
+RUN jupyter labextension install @jupyterlab/toc  
 # RUN jupyter serverextension enable --py jupyterlab_git 
-# RUN jupyter lab build  
+RUN jupyter lab build  
  
 # Use root to install .NET
 USER root
@@ -58,6 +58,10 @@ RUN dotnet_sdk_version=3.1.301 \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
     # Trigger first run experience by running arbitrary cmd
     && dotnet help
+    
+# Copy notebooks
+COPY ./config ${HOME}/.jupyter/
+COPY ./ ${HOME}/Notebooks/    
 
 # Copy package sources
 COPY ./NuGet.config ${HOME}/nuget.config
@@ -89,41 +93,39 @@ RUN dotnet interactive jupyter install
 # Enable telemetry once we install jupyter for the image
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
+# Set root to Notebooks
+WORKDIR ${HOME}/Notebooks/
+
 # NOTE: EVERYTHING ABOVE THIS SHOULD BE PROVIDED BY A dotnet-interactive OFFICIAL IMAGE
 # THIS MEANS IN THE FUTURE, THE ABOVE WILL TURN INTO SIMPLY:
 # FROM dotnet/interactive:latest
 
-# INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE
-RUN jupyter lab build  
+# INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE <=====================>
  
-USER root
-
 # Install kubectl
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
-    && chmod +x ./kubectl \
-    && mv ./kubectl /usr/local/bin
+# RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+#     && chmod +x ./kubectl \
+#     && mv ./kubectl /usr/local/bin
 
 # Set up kubectl autocompletion
-RUN apt-get update && apt-get install -y bash-completion \
-    && kubectl completion bash >/etc/bash_completion.d/kubectl
+# RUN apt-get update && apt-get install -y bash-completion \
+#    && kubectl completion bash >/etc/bash_completion.d/kubectl
 
 # Install UnixCompleters module so that kubectl completions work
-RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
-
-USER ${USER}
+# RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
 
 # Copy notebooks (So MyBinder will work)
-COPY --chown=${USER}:users . /data/JupyterNotebooks/
+# COPY --chown=${USER}:users . /data/JupyterNotebooks/
 
 # Copy theme settings
-RUN mkdir -p ${HOME}/.jupyter/lab/user-settings/
-COPY --chown=${USER}:users ./config/ ${HOME}/.jupyter/lab/user-settings/@jupyterlab/
+# RUN mkdir -p ${HOME}/.jupyter/lab/user-settings/
+# COPY --chown=${USER}:users ./config/ ${HOME}/.jupyter/lab/user-settings/@jupyterlab/
 
 # Copy profile.ps1
-COPY --chown=${USER}:users profile.ps1 ${HOME}/.config/powershell/Microsoft.dotnet-interactive_profile.ps1
+# COPY --chown=${USER}:users profile.ps1 ${HOME}/.config/powershell/Microsoft.dotnet-interactive_profile.ps1
 
 # Setup volume (So you can run locally with mounted filesystem)
-VOLUME /data/JupyterNotebooks/
+# VOLUME /data/JupyterNotebooks/
 
 # Set root to Notebooks
-WORKDIR /data/JupyterNotebooks/
+# WORKDIR /data/JupyterNotebooks/
