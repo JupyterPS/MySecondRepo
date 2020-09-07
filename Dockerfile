@@ -17,7 +17,7 @@ RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 
 # RUN jupyter labextension install @jupyterlab/toc  
 # RUN jupyter serverextension enable --py jupyterlab_git 
-RUN jupyter lab build  
+# RUN jupyter lab build  
  
 # Use root to install .NET
 USER root
