@@ -107,8 +107,8 @@ WORKDIR ${HOME}/Notebooks/
   #   && mv ./kubectl /usr/local/bin
 
 # Set up kubectl autocompletion
-# RUN apt-get update && apt-get install -y bash-completion \
-#   && kubectl completion bash >/etc/bash_completion.d/kubectl
+RUN apt-get update && apt-get install -y bash-completion \
+    && kubectl completion bash >/etc/bash_completion.d/kubectl
 
 # Install UnixCompleters module so that kubectl completions work
 RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
