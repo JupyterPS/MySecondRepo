@@ -99,7 +99,7 @@ WORKDIR ${HOME}/Notebooks/
 # NOTE: EVERYTHING ABOVE THIS SHOULD BE PROVIDED BY A dotnet-interactive OFFICIAL IMAGE
 # THIS MEANS IN THE FUTURE, THE ABOVE WILL TURN INTO SIMPLY:
 
-FROM dotnet/interactive:latest
+# FROM dotnet/interactive:latest
 
 # INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE <=====================>
 
