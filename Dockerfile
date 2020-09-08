@@ -113,7 +113,7 @@ WORKDIR ${HOME}/Notebooks/
   #   && kubectl completion bash >/etc/bash_completion.d/kubectl
 
 # Install UnixCompleters module so that kubectl completions work
-RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
+# RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
 
 # Copy notebooks (So MyBinder will work)
 # COPY --chown=${USER}:users . /data/JupyterNotebooks/
@@ -123,7 +123,7 @@ RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
 # COPY --chown=${USER}:users ./config/ ${HOME}/.jupyter/lab/user-settings/@jupyterlab/
 
 # Copy profile.ps1
-COPY --chown=${USER}:users profile.ps1 ${HOME}/.config/powershell/Microsoft.dotnet-interactive_profile.ps1
+# COPY --chown=${USER}:users profile.ps1 ${HOME}/.config/powershell/Microsoft.dotnet-interactive_profile.ps1
 
 # Setup volume (So you can run locally with mounted filesystem)
 # VOLUME /data/JupyterNotebooks/
