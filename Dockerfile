@@ -119,8 +119,8 @@ RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
 # COPY --chown=${USER}:users . /data/JupyterNotebooks/
 
 # Copy theme settings
-RUN mkdir -p ${HOME}/.jupyter/lab/user-settings/
-COPY --chown=${USER}:users ./config/ ${HOME}/.jupyter/lab/user-settings/@jupyterlab/
+# RUN mkdir -p ${HOME}/.jupyter/lab/user-settings/
+# COPY --chown=${USER}:users ./config/ ${HOME}/.jupyter/lab/user-settings/@jupyterlab/
 
 # Copy profile.ps1
 COPY --chown=${USER}:users profile.ps1 ${HOME}/.config/powershell/Microsoft.dotnet-interactive_profile.ps1
