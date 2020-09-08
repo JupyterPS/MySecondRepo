@@ -99,8 +99,6 @@ WORKDIR ${HOME}/Notebooks/
 # NOTE: EVERYTHING ABOVE THIS SHOULD BE PROVIDED BY A dotnet-interactive OFFICIAL IMAGE
 # THIS MEANS IN THE FUTURE, THE ABOVE WILL TURN INTO SIMPLY:
 
-# FROM dotnet/interactive:latest
-
 # INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE <=====================>
 
 # Install kubectl
@@ -110,7 +108,7 @@ WORKDIR ${HOME}/Notebooks/
 
 # Set up kubectl autocompletion
 # RUN apt-get update && apt-get install -y bash-completion \
-  #   && kubectl completion bash >/etc/bash_completion.d/kubectl
+#   && kubectl completion bash >/etc/bash_completion.d/kubectl
 
 # Install UnixCompleters module so that kubectl completions work
 RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
@@ -119,8 +117,8 @@ RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
 # COPY --chown=${USER}:users . /data/JupyterNotebooks/
 
 # Copy theme settings
-# RUN mkdir -p ${HOME}/.jupyter/lab/user-settings/
-# COPY --chown=${USER}:users ./config/ ${HOME}/.jupyter/lab/user-settings/@jupyterlab/
+RUN mkdir -p ${HOME}/.jupyter/lab/user-settings/
+COPY --chown=${USER}:users ./config/ ${HOME}/.jupyter/lab/user-settings/@jupyterlab/
 
 # Copy profile.ps1
 COPY --chown=${USER}:users profile.ps1 ${HOME}/.config/powershell/Microsoft.dotnet-interactive_profile.ps1
