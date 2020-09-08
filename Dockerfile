@@ -102,13 +102,13 @@ WORKDIR ${HOME}/Notebooks/
 
 # INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE <=====================>
 # Install kubectl
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
-    && chmod +x ./kubectl \
-    && mv ./kubectl /usr/local/bin
+# RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
+  #   && chmod +x ./kubectl \
+  #   && mv ./kubectl /usr/local/bin
 
 # Set up kubectl autocompletion
-RUN apt-get update && apt-get install -y bash-completion \
-    && kubectl completion bash >/etc/bash_completion.d/kubectl
+# RUN apt-get update && apt-get install -y bash-completion \
+  #   && kubectl completion bash >/etc/bash_completion.d/kubectl
 
 # Install UnixCompleters module so that kubectl completions work
 RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
@@ -121,7 +121,7 @@ RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
 # COPY --chown=${USER}:users ./config/ ${HOME}/.jupyter/lab/user-settings/@jupyterlab/
 
 # Copy profile.ps1
-# COPY --chown=${USER}:users profile.ps1 ${HOME}/.config/powershell/Microsoft.dotnet-interactive_profile.ps1
+COPY --chown=${USER}:users profile.ps1 ${HOME}/.config/powershell/Microsoft.dotnet-interactive_profile.ps1
 
 # Setup volume (So you can run locally with mounted filesystem)
 # VOLUME /data/JupyterNotebooks/
