@@ -113,7 +113,6 @@ WORKDIR ${HOME}/Notebooks/
 # Install UnixCompleters module so that kubectl completions work
 RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
 
-Copy notebooks (So MyBinder will work)
 COPY --chown=${USER}:users . /data/JupyterNotebooks/
 
 # Copy theme settings
