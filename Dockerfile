@@ -19,6 +19,8 @@ ENV USER ${NB_USER}
 ENV NB_UID ${NB_UID}
 ENV HOME /home/${NB_USER}
 
+WORKDIR ${HOME}
+
 USER root
 RUN apt-get update
 RUN apt-get install -y curl
@@ -56,10 +58,10 @@ RUN dotnet_sdk_version=3.1.301 \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
     # Trigger first run experience by running arbitrary cmd
     && dotnet help
-    
+
 # Copy notebooks
 COPY ./config ${HOME}/.jupyter/
-COPY ./ ${HOME}/Notebooks/    
+COPY ./ ${HOME}/Notebooks/
 
 # Copy package sources
 COPY ./NuGet.config ${HOME}/nuget.config
@@ -67,20 +69,11 @@ COPY ./NuGet.config ${HOME}/nuget.config
 RUN chown -R ${NB_UID} ${HOME}
 USER ${USER}
 
-# Install PowerShell global tool
-RUN powershell_version=7.0.2 \
-    && curl -SL --output PowerShell.Linux.x64.$powershell_version.nupkg https://pwshtool.blob.core.windows.net/tool/$powershell_version/PowerShell.Linux.x64.$powershell_version.nupkg \
-    && powershell_sha512='35ccceb6b72e92028a9a4fb83ca43951433dbb700d7e13ef27c69f15d96e3dcfea91cb0ed616baeb00a173edb0050d1596d826c86b4b6cf327ae182198c1f7fd' \
-    && echo "$powershell_sha512  PowerShell.Linux.x64.$powershell_version.nupkg" | sha512sum -c - \
-    && mkdir -p ${HOME}/.dotnet/tools/powershell \
-    && dotnet tool install -g --add-source . --version $powershell_version PowerShell.Linux.x64 \
-    && rm PowerShell.Linux.x64.$powershell_version.nupkg
-
 #Install nteract 
 RUN pip install nteract_on_jupyter
 
 # Install lastest build from master branch of Microsoft.DotNet.Interactive from myget
-RUN dotnet tool install -g Microsoft.dotnet-interactive --version 1.0.131701 --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
+RUN dotnet tool install -g Microsoft.dotnet-interactive --version 1.0.131806 --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
 
 ENV PATH="${PATH}:${HOME}/.dotnet/tools"
 RUN echo "$PATH"
@@ -93,9 +86,3 @@ ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
 # Set root to Notebooks
 WORKDIR ${HOME}/Notebooks/
-
-# NOTE: EVERYTHING ABOVE THIS SHOULD BE PROVIDED BY A dotnet-interactive OFFICIAL IMAGE
-# THIS MEANS IN THE FUTURE, THE ABOVE WILL TURN INTO SIMPLY:
-
-# INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE <=====================>
- 
