@@ -1,28 +1,27 @@
-FROM jupyter/minimal-notebook:latest
- 
-ARG NB_USER=jovyan
-ARG NB_UID=1000https://github.com/JupyterPS/MySecondRepo/settings
-ENV USER ${NB_USER}
-ENV NB_UID ${NB_UID}
-ENV HOME /home/${NB_USER}
-
-WORKDIR ${HOME}
+FROM jupyter/base-notebook:latest
 
 RUN python -m pip install --upgrade pip
 COPY requirements.txt ./requirements.txt
 RUN python -m pip  install -r requirements.txt
 RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 
-RUN jupyter serverextension enable --py jupyterlab_git 
-RUN jupyter labextension install @jupyterlab/toc  
-# RUN jupyter lab build
-RUN jupyter lab clean && jupyter lab build
- 
-# Use root to install .NET
-USER root
+RUN jupyter labextension install @jupyterlab/toc
+RUN jupyter serverextension enable --py jupyterlab_git
 
-RUN apt-get update \
-    && apt-get install -y curl
+RUN jupyter lab build
+
+#Working Directory
+WORKDIR $HOME
+
+ARG NB_USER=jovyan
+ARG NB_UID=1000
+ENV USER ${NB_USER}
+ENV NB_UID ${NB_UID}
+ENV HOME /home/${NB_USER}
+
+USER root
+RUN apt-get update
+RUN apt-get install -y curl
 
 ENV \
     # Enable detection of running in a container
@@ -99,32 +98,4 @@ WORKDIR ${HOME}/Notebooks/
 # THIS MEANS IN THE FUTURE, THE ABOVE WILL TURN INTO SIMPLY:
 
 # INSTALL ANYTHING ELSE YOU WANT IN THIS CONTAINER HERE <=====================>
-
-# Install kubectl
-# RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
-#     && chmod +x ./kubectl \
-#     && mv ./kubectl /usr/local/bin 
-
-# Set up kubectl autocompletion
-# RUN apt-get update && apt-get install -y bash-completion \
-#     && kubectl completion bash >/etc/bash_completion.d/kubectl
-
-# Install UnixCompleters module so that kubectl completions work
-RUN pwsh -c Install-Module Microsoft.PowerShell.UnixCompleters -Force
-
-COPY --chown=${USER}:users . /data/JupyterNotebooks/
-
-# Copy theme settings
-RUN mkdir -p ${HOME}/.jupyter/lab/user-settings/
-COPY --chown=${USER}:users ./config/ ${HOME}/.jupyter/lab/user-settings/@jupyterlab/
-
-# Copy profile.ps1
-COPY --chown=${USER}:users profile.ps1 ${HOME}/.config/powershell/Microsoft.dotnet-interactive_profile.ps1
-
-# Setup volume (So you can run locally with mounted filesystem)
-VOLUME /data/JupyterNotebooks/
-
-# Set root to Notebooks
-WORKDIR /data/JupyterNotebooks/
- 
  
