@@ -9,8 +9,8 @@ RUN jupyter labextension install @jupyterlab/toc
 RUN jupyter serverextension enable --py jupyterlab_git
 
 # RUN jupyter lab build
-jupyter lab clean --all
-jupyter lab build --debug
+RUN jupyter lab clean --all
+RUN jupyter lab build --debug
 
 #Working Directory
 WORKDIR $HOME
