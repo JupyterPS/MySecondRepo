@@ -5,13 +5,18 @@ COPY requirements.txt ./requirements.txt
 RUN python -m pip  install -r requirements.txt
 RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 
-RUN jupyter serverextension enable --py jupyterlab_git --sys-prefix
+RUN python -m pip install jupyterlab_github
+RUN python -m pip install jupyterlab-git
 
-# RUN jupyter labextension install @jupyterlab/git    
-# RUN jupyter labextension install @jupyterlab/toc
+RUN jupyter serverextension enable --py jupyterlab_git --sys-prefix
+RUN jupyter serverextension enable --sys-prefix jupyterlab_github
  
-# RUN jupyter lab build
-  
+# RUN jupyter labextension install @jupyterlab/toc
+RUN jupyter labextension install @jupyterlab/github
+RUN jupyter labextension install @jupyterlab/git 
+ 
+RUN jupyter lab build 
+
 #Working Directory
 WORKDIR $HOME
 
@@ -37,7 +42,24 @@ ENV \
     # Opt out of telemetry until after we install jupyter when building the image, this prevents caching of machine id
     DOTNET_TRY_CLI_TELEMETRY_OPTOUT=true
 
-# Install .NET CLI dependencies
+# Install .NET CLI FROM jupyter/base-notebook:latest
+
+RUN python -m pip install --upgrade pip
+COPY requirements.txt ./requirements.txt
+RUN python -m pip  install -r requirements.txt
+RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
+
+RUN python -m pip install jupyterlab_github
+RUN python -m pip install jupyterlab-git
+
+RUN jupyter serverextension enable --py jupyterlab_git --sys-prefix
+RUN jupyter serverextension enable --sys-prefix jupyterlab_github
+ 
+# RUN jupyter labextension install @jupyterlab/toc
+RUN jupyter labextension install @jupyterlab/github
+RUN jupyter labextension install @jupyterlab/git 
+ 
+RUN jupyter lab build
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         libc6 \
