@@ -5,10 +5,8 @@ COPY requirements.txt ./requirements.txt
 RUN python -m pip  install -r requirements.txt
 RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 
-#Install git
-RUN apt-get update \
-         apt-get install -y git
-
+RUN git clone -b https://:x-oauth-basic@github.com/jagadish12/SampleTest.git /myapp/
+ 
 RUN python -m pip install jupyterlab_github
 RUN python -m pip install --upgrade jupyterlab jupyterlab-git
 
