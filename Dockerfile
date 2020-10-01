@@ -5,15 +5,8 @@ COPY requirements.txt ./requirements.txt
 RUN python -m pip  install -r requirements.txt
 RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 
-RUN apt-get update && \
-    apt-get install -yq --no-install-recommends wget pwgen ca-certificates && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN python -m pip install --upgrade jupyterlab jupyterlab-git
-
 RUN python -m pip install jupyterlab_github
-RUN python -m pip install jupyterlab_git
+RUN python -m pip install --upgrade jupyterlab jupyterlab-git
 
 RUN jupyter serverextension enable --py jupyterlab_github --sys-prefix
 RUN jupyter serverextension enable --py jupyterlab_git --sys-prefix
