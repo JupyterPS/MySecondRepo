@@ -1,14 +1,14 @@
 FROM jupyter/base-notebook:latest
 
-RUN apt-get update \
- && apt-get install -yq --no-install-recommends \
-    git \
- && apt-get clean && rm -rf /var/lib/apt/lists/*
-
 RUN python -m pip install --upgrade pip
 COPY requirements.txt ./requirements.txt
 RUN python -m pip  install -r requirements.txt
 RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
+
+RUN apt-get update && \
+    apt-get install -yq --no-install-recommends wget pwgen ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN python -m pip install --upgrade jupyterlab jupyterlab-git
 
