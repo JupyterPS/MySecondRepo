@@ -11,7 +11,6 @@ RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 RUN python -m pip install jupyterlab_github
 RUN python -m pip install --upgrade jupyterlab jupyterlab-git
 
-RUN jupyter labextension install @jupyterlab/github
 RUN jupyter labextension install @jupyterlab/git 
 RUN jupyter labextension install @jupyterlab/toc
 
