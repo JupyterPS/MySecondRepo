@@ -14,7 +14,7 @@ RUN python -m pip install --upgrade jupyterlab jupyterlab-git
 RUN jupyter labextension install @jupyterlab/git 
 RUN jupyter labextension install @jupyterlab/toc
 
-RUN jupyter -m pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose
+RUN python -m pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose
 
 RUN jupyter lab build 
 
