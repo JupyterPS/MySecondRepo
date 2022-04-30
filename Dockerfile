@@ -3,19 +3,14 @@ FROM jupyter/base-notebook:latest
 RUN python -m pip install --upgrade pip
 COPY requirements.txt ./requirements.txt
 RUN python -m pip  install -r requirements.txt
-RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
-
-RUN python -m pip  install -r requirements.txt
-RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
+RUN python -m pip install --upgrade --no-deps --force-reinstall notebook 
 
 RUN python -m pip install jupyterlab_github
-RUN python pip install jupyterlab-git
+##RUN python pip install jupyterlab-git
 RUN python -m pip install --upgrade --pre jupyterlab jupyterlab-git 
 
 RUN jupyter labextension install @jupyterlab/git 
-RUN jupyter labextension install @jupyterlab/toc
-
- 
+RUN jupyter labextension install @jupyterlab/toc 
 
 RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose   
 
