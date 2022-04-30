@@ -12,8 +12,14 @@ RUN python -m pip install jupyterlab_github
 RUN python pip install jupyterlab-git
 RUN python -m pip install --upgrade --pre jupyterlab jupyterlab-git
 
+FROM ubuntu:latest
+RUN apt-get -y update
+RUN apt-get -y install git
+
 RUN jupyter labextension install @jupyterlab/git 
 RUN jupyter labextension install @jupyterlab/toc
+
+RUN sudo docker build -t sample-image
 
 RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose   
 
