@@ -17,7 +17,7 @@ RUN jupyter labextension install @jupyterlab/toc
 RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose   
 
 ## Install necessary packages
-RUN apt-get update
+## RUN apt-get update
 RUN apt-get install -y build-essential curl apt-utils git
 
 # Install Jupyterlab with extensions
