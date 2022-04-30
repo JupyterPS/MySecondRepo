@@ -25,7 +25,7 @@ RUN apt-get -y install git
 
 # Install Jupyterlab with extensions
 RUN echo "${YELLOW}Installing/Updating Jupyter Lab and all required packages"
-RUN pip install --upgrade pip tornado jupyterlab jupyterlab-git nbdime nteract_on_jupyter elyra
+## RUN pip install --upgrade pip tornado jupyterlab jupyterlab-git nbdime nteract_on_jupyter elyra
 
 RUN jupyter lab build 
 
