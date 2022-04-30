@@ -14,7 +14,15 @@ RUN python -m pip install --upgrade jupyterlab jupyterlab-git
 RUN jupyter labextension install @jupyterlab/git 
 RUN jupyter labextension install @jupyterlab/toc
 
-RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose
+RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose   
+
+## Install necessary packages
+RUN apt-get update
+RUN apt-get install -y build-essential curl apt-utils git
+
+# Install Jupyterlab with extensions
+RUN echo "${YELLOW}Installing/Updating Jupyter Lab and all required packages"
+RUN pip install --upgrade pip tornado jupyterlab jupyterlab-git nbdime nteract_on_jupyter elyra
 
 RUN jupyter lab build 
 
