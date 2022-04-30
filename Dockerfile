@@ -21,7 +21,7 @@ RUN apt-get -y install git
 
 ## RUN sudo docker build -t sample-image
 
-RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose   
+## RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose   
 
 # Install Jupyterlab with extensions
 RUN echo "${YELLOW}Installing/Updating Jupyter Lab and all required packages"
