@@ -9,23 +9,19 @@ RUN python -m pip  install -r requirements.txt
 RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 
 RUN python -m pip install jupyterlab_github
-## RUN python pip install jupyterlab-git
-RUN python -m pip install --upgrade --pre jupyterlab jupyterlab-git
+RUN python pip install jupyterlab-git
+RUN python -m pip install --upgrade --pre jupyterlab jupyterlab-git 
 
-FROM ubuntu:latest
-RUN apt-get -y update
-RUN apt-get -y install git
+RUN jupyter labextension install @jupyterlab/git 
+RUN jupyter labextension install @jupyterlab/toc
 
-## RUN jupyter labextension install @jupyterlab/git 
-## RUN jupyter labextension install @jupyterlab/toc
+ 
 
-## RUN sudo docker build -t sample-image
-
-## RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose   
+RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose   
 
 # Install Jupyterlab with extensions
 RUN echo "${YELLOW}Installing/Updating Jupyter Lab and all required packages"
-## RUN pip install --upgrade pip tornado jupyterlab jupyterlab-git nbdime nteract_on_jupyter elyra
+RUN pip install --upgrade pip tornado jupyterlab jupyterlab-git nbdime nteract_on_jupyter elyra
 
 RUN jupyter lab build 
 
