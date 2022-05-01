@@ -13,7 +13,6 @@ RUN jupyter labextension install @jupyterlab/toc
 
 RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose    
 
-ADD ssh-private-key /root/.ssh/id_rsa
 RUN git clone git@github.com:eugenp/tutorials.git
 
 RUN jupyter lab build 
