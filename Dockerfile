@@ -9,9 +9,9 @@ RUN python -m pip install jupyterlab_github
 RUN python -m pip install jupyterlab-git
 
 RUN jupyter labextension install @jupyterlab/git 
-#RUN jupyter labextension install @jupyterlab/toc 
+#RUN jupyter labextension install sudo apt-get update@jupyterlab/to
 
-RUN apt-get update
+RUN sudo apt-get update
 RUN apt-get install -y libicu66
 
 RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose    
