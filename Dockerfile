@@ -30,6 +30,9 @@ USER root
 RUN apt-get update
 RUN apt-get install -y curl
 
+Run apt-get update
+Run apt-get install -y libicu66
+
 ENV \
     # Enable detection of running in a container
     DOTNET_RUNNING_IN_CONTAINER=true \
