@@ -31,22 +31,21 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 # Install .NET SDK
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
 
-# Install .NET Runtime explicitly to avoid missing runtime error
+# Explicitly install .NET Runtime to resolve missing runtime error
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet
 
 # Check that .NET is installed correctly
 RUN echo "Dotnet is installed at: $(find /home/jovyan/.dotnet -type f -name 'dotnet')" \
     && ls -l /home/jovyan/.dotnet/
 
-# Set up PATH for jovyan user to access dotnet
-RUN echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /etc/profile.d/dotnet.sh \
-    && chmod +x /etc/profile.d/dotnet.sh
+# Set up the dotnet PATH environment variable in the .bashrc to make it persistent
+RUN echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /home/jovyan/.bashrc
 
 # Ensure that the PATH is updated and dotnet is available
-RUN source /etc/profile.d/dotnet.sh && dotnet --version
+RUN source /home/jovyan/.bashrc && dotnet --version
 
 # Install dotnet tool globally: Microsoft.dotnet-interactive
-RUN source /etc/profile.d/dotnet.sh && dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
+RUN source /home/jovyan/.bashrc && dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
 
