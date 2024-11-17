@@ -10,7 +10,7 @@ ENV DOTNET_ROOT=/usr/share/dotnet
 # Switch to root to install system packages
 USER root
 
-# Install required dependencies
+# Install required dependencies and Microsoft's package signing key
 RUN apt-get update && apt-get install -y \
     curl \
     libssl-dev \
@@ -21,15 +21,7 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     software-properties-common \
     unzip \
-    wget \
     && rm -rf /var/lib/apt/lists/*
-
-# Install PowerShell
-RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb \
-    && dpkg -i packages-microsoft-prod.deb \
-    && apt-get update \
-    && apt-get install -y powershell \
-    && rm packages-microsoft-prod.deb
 
 # Add Microsoft's package signing key and package repository for .NET SDK
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb \
@@ -37,11 +29,18 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
     && apt-get update \
     && apt-get install -y apt-transport-https
 
-# Install the .NET SDK (6.0 version as an example)
+# Install .NET SDK (6.0 version as an example)
 RUN apt-get install -y dotnet-sdk-6.0
 
 # Verify .NET SDK installation
 RUN dotnet --version
+
+# Install PowerShell
+RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && apt-get update \
+    && apt-get install -y powershell \
+    && rm packages-microsoft-prod.deb
 
 # Install .NET Interactive for PowerShell Jupyter Kernel
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
@@ -57,5 +56,6 @@ RUN powershell --version
 
 # Switch back to non-root user
 USER $NB_UID
+
 
 
