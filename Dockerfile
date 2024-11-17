@@ -4,7 +4,7 @@ FROM jupyter/base-notebook:latest
 # Switch to root to install additional packages
 USER root
 
-# Install PowerShell, .NET SDK, and required dependencies
+# Install curl and basic dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     libssl-dev \
@@ -16,8 +16,15 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     software-properties-common \
     unzip \
-    powershell \
     && rm -rf /var/lib/apt/lists/*
+
+# Add Microsoft's package repository for PowerShell
+RUN wget -q "https://packages.microsoft.com/config/ubuntu/20.04/prod.list" -O /etc/apt/sources.list.d/microsoft-prod.list \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && apt-get update
+
+# Install PowerShell
+RUN apt-get install -y powershell
 
 # Install .NET SDK (You can choose a specific version as needed)
 RUN dotnet_sdk_version=6.0.100 \
@@ -33,7 +40,7 @@ RUN dotnet_sdk_version=6.0.100 \
 # Install .NET Interactive
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
 
-# Clean up
+# Clean up unnecessary files
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Switch back to the jovyan user for Jupyter operations
@@ -45,7 +52,7 @@ ENV DOTNET_CLI_TELEMETRY_OPTOUT=true
 # Expose the Jupyter notebook port
 EXPOSE 8888
 
-# Expose PowerShell for shell access
+# Expose PowerShell for terminal access
 EXPOSE 4051
 
 # Start the Jupyter notebook and PowerShell for terminal
