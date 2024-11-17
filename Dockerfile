@@ -30,13 +30,14 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 
 # Install .NET SDK and Runtime (make sure both are installed)
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
-    && curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet
+    && curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet \
+    && echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /home/jovyan/.bashrc
 
-# Make sure the .NET path is correctly set for non-interactive shell
-ENV PATH="$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools"
+# Force sourcing of the profile to ensure environment variables are set
+RUN source /home/jovyan/.bashrc && dotnet --version
 
 # Install dotnet tool globally: Microsoft.dotnet-interactive
-RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
+RUN source /home/jovyan/.bashrc && dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
 
