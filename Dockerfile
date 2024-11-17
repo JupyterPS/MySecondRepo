@@ -3,24 +3,32 @@ FROM jupyter/base-notebook:latest
 # Ensure we are running as root
 USER root
 
-# Update pip and install dependencies
-RUN python -m pip install --upgrade pip
-COPY requirements.txt ./requirements.txt
-RUN python -m pip install -r requirements.txt
-RUN python -m pip install --upgrade --no-deps --force-reinstall notebook 
-
-RUN python -m pip install jupyterlab_github
-RUN python -m pip install jupyterlab-git
-
-# Install system dependencies as root
+# Install dependencies, including PowerShell
 RUN apt-get update && apt-get install -y \
     curl \
     libssl-dev \
     libicu-dev \
     libssl1.1 \
+    gnupg \
+    lsb-release \
     && rm -rf /var/lib/apt/lists/*
 
-# Install .NET Core SDK
+# Add Microsoft's APT repository for PowerShell
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/microsoft-prod.list
+
+# Install PowerShell
+RUN apt-get update && apt-get install -y powershell
+
+# Other installation steps
+RUN python -m pip install --upgrade pip
+COPY requirements.txt ./requirements.txt
+RUN python -m pip install -r requirements.txt
+RUN python -m pip install --upgrade --no-deps --force-reinstall notebook 
+RUN python -m pip install jupyterlab_github
+RUN python -m pip install jupyterlab-git
+
+# Install .NET Core SDK and other dependencies
 RUN dotnet_sdk_version=3.1.301 \
     && curl -SL --output dotnet.tar.gz https://dotnetcli.azureedge.net/dotnet/Sdk/$dotnet_sdk_version/dotnet-sdk-$dotnet_sdk_version-linux-x64.tar.gz \
     && dotnet_sha512='dd39931df438b8c1561f9a3bdb50f72372e29e5706d3fb4c490692f04a3d55f5acc0b46b8049bc7ea34dedba63c71b4c64c57032740cbea81eef1dce41929b4e' \
@@ -29,19 +37,7 @@ RUN dotnet_sdk_version=3.1.301 \
     && tar -ozxf dotnet.tar.gz -C /usr/share/dotnet \
     && rm dotnet.tar.gz \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
-    # Trigger first run experience by running arbitrary cmd
     && dotnet help
-
-# Install .NET CLI dependencies
-RUN apt-get update && apt-get install -y \
-    libc6 \
-    libgcc1 \
-    libgssapi-krb5-2 \
-    libicu66 \
-    libssl1.1 \
-    libstdc++6 \
-    zlib1g \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy notebooks and configuration
 COPY ./config ${HOME}/.jupyter/
