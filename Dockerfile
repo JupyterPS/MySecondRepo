@@ -29,12 +29,6 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && apt-get install -y powershell
 
 # Install .NET SDK 8.0
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
-
-# Install .NET Core 3.1 SDK and Runtime
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --version 3.1 --runtime dotnet
-
-# Install .NET SDK 8.0
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --version 8.0 --runtime dotnet
 
 # Install dotnet tool globally: Microsoft.dotnet-interactive
@@ -58,7 +52,6 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
-
 
 
 
