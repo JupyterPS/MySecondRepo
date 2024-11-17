@@ -39,12 +39,13 @@ ENV PATH="/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools:$PATH"
 ENV DOTNET_ROOT="/home/jovyan/.dotnet"
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
-# Reload shell for the new path (use bash -c to ensure the path update takes effect immediately)
+# Add a script to force the shell to recognize the new tool installation
 RUN echo "export PATH=$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /home/jovyan/.bashrc \
     && source /home/jovyan/.bashrc \
-    && dotnet --version
+    && dotnet --version \
+    && dotnet tool list -g
 
-# Set the default user to jovyan (the original user in jupyter/base-notebook)
+# Switch back to the jovyan user (original user in jupyter/base-notebook)
 USER jovyan
 
 # Expose the Jupyter Notebook port
@@ -52,6 +53,7 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
+
 
 
 
