@@ -28,23 +28,27 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && apt-get update \
     && apt-get install -y powershell
 
-# Install .NET SDK and Runtime
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
-    && curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet \
-    && echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /home/jovyan/.bashrc
+# Install .NET SDK 8.0
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
 
-# Explicitly set runtime path
+# Install .NET Core 3.1 SDK and Runtime
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --version 3.1 --runtime dotnet
+
+# Install .NET SDK 8.0
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --version 8.0 --runtime dotnet
+
+# Install dotnet tool globally: Microsoft.dotnet-interactive
+RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
+    --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
+    && dotnet interactive jupyter install
+
+# Set PATH for the dotnet tools and runtime
 ENV PATH="/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools:$PATH"
 ENV DOTNET_ROOT="/home/jovyan/.dotnet"
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
 # Verify .NET installation and version
 RUN dotnet --version
-
-# Install dotnet tool globally: Microsoft.dotnet-interactive
-RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
-    --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
-    && dotnet interactive jupyter install
 
 # Set the default user to jovyan (the original user in jupyter/base-notebook)
 USER jovyan
