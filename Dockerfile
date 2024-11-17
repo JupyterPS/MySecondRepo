@@ -20,17 +20,11 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     software-properties-common \
     unzip \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install .NET SDK via the dotnet-install.sh script and create symlink
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
-    && ln -s /root/.dotnet/dotnet /usr/bin/dotnet  # Create symlink to make dotnet command globally accessible
-
-# Update PATH to include dotnet tools in the same layer where we install dotnet
-ENV PATH="/root/.dotnet:/root/.dotnet/tools:${PATH}"
-
-# Verify .NET SDK installation by checking the version
-RUN dotnet --version
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
+    && ln -s /root/.dotnet/dotnet /usr/bin/dotnet  # Create symlink to make dotnet command globally accessible \
+    && echo "export PATH=/root/.dotnet:/root/.dotnet/tools:$PATH" >> /etc/bash.bashrc \
+    && dotnet --version  # Verify dotnet is installed
 
 # Install PowerShell
 RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb \
