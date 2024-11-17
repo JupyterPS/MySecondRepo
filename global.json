@@ -5,9 +5,19 @@
   },
   "tools": {
     "dotnet": "3.1.200",
-    "rollForward": "latestMinor"
+    "rollForward": "latestMinor",
+    "dotnet-ef": "3.1.200"
   },
   "msbuild-sdks": {
-    "Microsoft.DotNet.Arcade.Sdk": "1.0.0-beta.20302.3"
-  }
+    "Microsoft.DotNet.Arcade.Sdk": "1.0.0-beta.20302.3",
+    "Microsoft.NET.Sdk": "5.0.102"
+  },
+  "frameworks": {
+    "netcoreapp": "3.1"
+  },
+  "versioning": {
+    "defaultVersion": "3.1",
+    "rollForwardVersion": "latestPatch"
+  },
+  "version": "1.0.0"
 }
