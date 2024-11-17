@@ -31,14 +31,18 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 # Install .NET SDK via the official script
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
 
-# Set the PATH explicitly for the Dockerfile to recognize dotnet globally
-ENV PATH="/root/.dotnet:/root/.dotnet/tools:${PATH}"
+# Debugging step: Check where dotnet is installed
+RUN echo "Dotnet is installed at: $(find /root/.dotnet -type f -name 'dotnet')" && ls -l /root/.dotnet/
 
-# Verify that dotnet is installed correctly
-RUN dotnet --version
+# Add dotnet to PATH
+RUN echo "export PATH=\$PATH:/root/.dotnet:/root/.dotnet/tools" > /etc/profile.d/dotnet.sh \
+    && chmod +x /etc/profile.d/dotnet.sh
+
+# Ensure that the PATH is updated and dotnet is available
+RUN source /etc/profile.d/dotnet.sh && dotnet --version
 
 # Install dotnet tool globally: Microsoft.dotnet-interactive
-RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
+RUN source /etc/profile.d/dotnet.sh && dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
 
@@ -50,5 +54,3 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
-
-
