@@ -28,24 +28,15 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && apt-get update \
     && apt-get install -y powershell
 
-# Install .NET SDK
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
+# Install .NET SDK and Runtime
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
+    && curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet
 
-# Explicitly install .NET Runtime to resolve missing runtime error
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet
-
-# Check that .NET is installed correctly
-RUN echo "Dotnet is installed at: $(find /home/jovyan/.dotnet -type f -name 'dotnet')" \
-    && ls -l /home/jovyan/.dotnet/
-
-# Set up the dotnet PATH environment variable in the .bashrc to make it persistent
-RUN echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /home/jovyan/.bashrc
-
-# Ensure that the PATH is updated and dotnet is available
-RUN source /home/jovyan/.bashrc && dotnet --version
+# Make sure the .NET path is correctly set for non-interactive shell
+ENV PATH="$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools"
 
 # Install dotnet tool globally: Microsoft.dotnet-interactive
-RUN source /home/jovyan/.bashrc && dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
+RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
 
