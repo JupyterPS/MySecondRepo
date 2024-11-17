@@ -31,16 +31,16 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 # Install .NET SDK via the official script with debug output
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
     && echo "Dotnet install script finished" \
-    && ls -l /root/.dotnet \
+    && ls -l /home/jovyan/.dotnet \
     && echo "Dotnet installation check complete."
 
-# Debug: Check the dotnet binary location explicitly
-RUN echo "Checking for dotnet binary in /root/.dotnet" \
-    && find /root/.dotnet -type f -name 'dotnet' \
-    && ls -l /root/.dotnet/
+# Debug: Check the dotnet binary location explicitly for jovyan
+RUN echo "Checking for dotnet binary in /home/jovyan/.dotnet" \
+    && find /home/jovyan/.dotnet -type f -name 'dotnet' \
+    && ls -l /home/jovyan/.dotnet/
 
-# Add dotnet to PATH
-RUN echo "export PATH=\$PATH:/root/.dotnet:/root/.dotnet/tools" > /etc/profile.d/dotnet.sh \
+# Add dotnet to PATH for jovyan user
+RUN echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" > /etc/profile.d/dotnet.sh \
     && chmod +x /etc/profile.d/dotnet.sh
 
 # Ensure that the PATH is updated and dotnet is available
