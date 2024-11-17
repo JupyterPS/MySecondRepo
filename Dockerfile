@@ -9,7 +9,7 @@ ENV POWERSHELL_TELEMETRY_OPTOUT=1
 # Switch to root user to install system packages
 USER root
 
-# Install required dependencies for dotnet and PowerShell
+# Install required dependencies for dotnet
 RUN apt-get update && apt-get install -y \
     curl \
     libssl-dev \
@@ -52,7 +52,6 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
-
 
 
 
