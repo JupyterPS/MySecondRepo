@@ -23,14 +23,11 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Add Microsoft's package signing key and package repository for .NET SDK
-RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb \
-    && dpkg -i packages-microsoft-prod.deb \
-    && apt-get update \
-    && apt-get install -y apt-transport-https
+# Install .NET SDK via the dotnet-install.sh script
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
 
-# Install .NET SDK (6.0 version as an example)
-RUN apt-get install -y dotnet-sdk-6.0
+# Ensure the dotnet binaries are available in the path
+ENV PATH="$PATH:/root/.dotnet"
 
 # Verify .NET SDK installation
 RUN dotnet --version
@@ -56,6 +53,7 @@ RUN powershell --version
 
 # Switch back to non-root user
 USER $NB_UID
+
 
 
 
