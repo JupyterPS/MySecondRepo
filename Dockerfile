@@ -22,9 +22,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PowerShell
+# Add Microsoft's repository for PowerShell for Ubuntu 22.04 (Jammy)
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && apt-add-repository https://packages.microsoft.com/ubuntu/20.04/prod \
+    && apt-add-repository "deb https://packages.microsoft.com/ubuntu/22.04/prod jammy main" \
     && apt-get update \
     && apt-get install -y powershell
 
@@ -50,7 +50,6 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
-
 
 
 
