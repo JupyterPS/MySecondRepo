@@ -1,7 +1,7 @@
 # Start with the Jupyter base image
 FROM jupyter/base-notebook:latest
 
-# Install dependencies and PowerShell with elevated privileges
+# Install required dependencies and add the Microsoft repository for PowerShell
 USER root
 
 RUN apt-get update \
@@ -16,7 +16,11 @@ RUN apt-get update \
     apt-transport-https \
     software-properties-common \
     unzip \
-    powershell \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg \
+    && mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg \
+    && sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-jammy-prod jammy main" > /etc/apt/sources.list.d/microsoft.list' \
+    && apt-get update \
+    && apt-get install -y powershell \
     && rm -rf /var/lib/apt/lists/*
 
 # Install .NET SDK (version 6.0.100 in this case)
@@ -28,8 +32,9 @@ RUN dotnet_sdk_version=6.0.100 \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
     && dotnet --version
 
-# Verify the installation of PowerShell
+# Verify PowerShell installation
 RUN pwsh --version
 
-# Verify the installation of .NET SDK
+# Verify .NET SDK installation
 RUN dotnet --version
+
