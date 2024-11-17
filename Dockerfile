@@ -38,13 +38,13 @@ RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-ins
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet \
     && echo "Dotnet runtime installation complete"
 
-# Debug: Check the dotnet binary location explicitly for jovyan
+# Check and list the .NET binary location explicitly for jovyan
 RUN echo "Checking for dotnet binary in /home/jovyan/.dotnet" \
     && find /home/jovyan/.dotnet -type f -name 'dotnet' \
     && ls -l /home/jovyan/.dotnet/
 
-# Add dotnet to PATH for jovyan user
-RUN echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" > /etc/profile.d/dotnet.sh \
+# Make sure to add dotnet to the PATH for jovyan user
+RUN echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /etc/profile.d/dotnet.sh \
     && chmod +x /etc/profile.d/dotnet.sh
 
 # Ensure that the PATH is updated and dotnet is available
@@ -55,7 +55,7 @@ RUN source /etc/profile.d/dotnet.sh && dotnet tool install --global Microsoft.do
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
 
-# Set default user to jovyan (the original user in jupyter/base-notebook)
+# Set the default user to jovyan (the original user in jupyter/base-notebook)
 USER jovyan
 
 # Expose the Jupyter Notebook port
@@ -63,3 +63,4 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
+
