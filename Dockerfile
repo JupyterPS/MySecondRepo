@@ -30,12 +30,14 @@ RUN wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsof
     && apt-get install -y powershell \
     && rm packages-microsoft-prod.deb
 
+# Add Microsoft's package signing key and package repository for .NET SDK
+RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && apt-get update \
+    && apt-get install -y apt-transport-https
+
 # Install the .NET SDK (6.0 version as an example)
-RUN wget https://download.visualstudio.microsoft.com/download/pr/3a184f57-3f5a-4d95-bc55-4d857d839f38/3776d8304fd32a2f70311bb043da1607/dotnet-sdk-6.0.100-linux-x64.tar.gz \
-    && mkdir -p /usr/share/dotnet \
-    && tar -zxf dotnet-sdk-6.0.100-linux-x64.tar.gz -C /usr/share/dotnet \
-    && rm dotnet-sdk-6.0.100-linux-x64.tar.gz \
-    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+RUN apt-get install -y dotnet-sdk-6.0
 
 # Install .NET Interactive for PowerShell Jupyter Kernel
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
