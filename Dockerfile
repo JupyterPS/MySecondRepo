@@ -1,5 +1,8 @@
 FROM jupyter/base-notebook:latest
 
+# Ensure running apt-get with root permissions
+USER root
+
 # Install necessary packages and libraries
 RUN apt-get update && apt-get install -y \
     curl \
@@ -38,8 +41,9 @@ COPY ./config ${HOME}/.jupyter/
 COPY ./ ${HOME}/Notebooks/
 
 # Set working directory and user permissions
-USER root
 RUN chown -R jovyan ${HOME}
+
+# Switch back to jovyan user
 USER jovyan
 
 WORKDIR ${HOME}/Notebooks/
@@ -64,4 +68,3 @@ USER jovyan
 ENV PATH="${PATH}:${HOME}/.dotnet/tools"
 RUN echo "$PATH"
 RUN dotnet interactive jupyter install
-
