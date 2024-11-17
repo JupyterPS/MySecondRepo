@@ -31,10 +31,11 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 # Install .NET SDK via the official script
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
 
-# Explicitly set the path to the dotnet installation and verify installation
-RUN echo "export PATH=\$PATH:/root/.dotnet:/root/.dotnet/tools" >> ~/.bashrc && \
-    source ~/.bashrc && \
-    dotnet --version
+# Set the PATH explicitly for the Dockerfile to recognize dotnet globally
+ENV PATH="/root/.dotnet:/root/.dotnet/tools:${PATH}"
+
+# Verify that dotnet is installed correctly
+RUN dotnet --version
 
 # Install dotnet tool globally: Microsoft.dotnet-interactive
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
@@ -49,6 +50,5 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
-
 
 
