@@ -28,22 +28,17 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && apt-get update \
     && apt-get install -y powershell
 
-# Install .NET SDK and Runtime via the official script
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
-    && echo "Dotnet install script finished" \
-    && ls -l /home/jovyan/.dotnet \
-    && echo "Dotnet installation check complete."
+# Install .NET SDK
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
 
 # Install .NET Runtime explicitly to avoid missing runtime error
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet \
-    && echo "Dotnet runtime installation complete"
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet
 
-# Check and list the .NET binary location explicitly for jovyan
-RUN echo "Checking for dotnet binary in /home/jovyan/.dotnet" \
-    && find /home/jovyan/.dotnet -type f -name 'dotnet' \
+# Check that .NET is installed correctly
+RUN echo "Dotnet is installed at: $(find /home/jovyan/.dotnet -type f -name 'dotnet')" \
     && ls -l /home/jovyan/.dotnet/
 
-# Make sure to add dotnet to the PATH for jovyan user
+# Set up PATH for jovyan user to access dotnet
 RUN echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /etc/profile.d/dotnet.sh \
     && chmod +x /etc/profile.d/dotnet.sh
 
@@ -63,4 +58,5 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
+
 
