@@ -5,6 +5,7 @@ FROM jupyter/base-notebook:latest
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 ENV POWERSHELL_TELEMETRY_OPTOUT=1
+ENV DOTNET_ROOT=/usr/share/dotnet
 
 # Switch to root to install system packages
 USER root
@@ -38,6 +39,9 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
 
 # Install the .NET SDK (6.0 version as an example)
 RUN apt-get install -y dotnet-sdk-6.0
+
+# Verify .NET SDK installation
+RUN dotnet --version
 
 # Install .NET Interactive for PowerShell Jupyter Kernel
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
