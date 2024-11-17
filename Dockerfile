@@ -34,13 +34,15 @@ RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.1553
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
 
-# Set PATH for the dotnet tools and runtime
+# Set the PATH to include .NET tools and runtime
 ENV PATH="/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools:$PATH"
 ENV DOTNET_ROOT="/home/jovyan/.dotnet"
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
-# Verify .NET installation and version
-RUN dotnet --version
+# Reload shell for the new path (use bash -c to ensure the path update takes effect immediately)
+RUN echo "export PATH=$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /home/jovyan/.bashrc \
+    && source /home/jovyan/.bashrc \
+    && dotnet --version
 
 # Set the default user to jovyan (the original user in jupyter/base-notebook)
 USER jovyan
@@ -50,6 +52,7 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
+
 
 
 
