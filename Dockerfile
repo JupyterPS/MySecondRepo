@@ -4,7 +4,7 @@ FROM jupyter/base-notebook:latest
 # Ensure root permissions for system updates and installations
 USER root
 
-# Install necessary system dependencies
+# Install necessary system dependencies including SSL libraries
 RUN apt-get update && apt-get install -y \
     curl \
     libssl-dev \
@@ -41,11 +41,8 @@ RUN pip install --no-cache-dir \
     sympy \
     nose
 
-# Install Jupyter extensions
+# Install JupyterLab Git extension
 RUN jupyter labextension install @jupyterlab/git
-
-# Install any additional JupyterLab extensions
-RUN jupyter labextension install jupyterlab-git
 
 # Install .NET Interactive Jupyter kernel
 RUN dotnet interactive jupyter install
