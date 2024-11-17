@@ -5,7 +5,6 @@ FROM jupyter/base-notebook:latest
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 ENV POWERSHELL_TELEMETRY_OPTOUT=1
-ENV DOTNET_ROOT=/usr/share/dotnet
 
 # Switch to root to install system packages
 USER root
@@ -24,10 +23,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install .NET SDK via the dotnet-install.sh script
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
+    && ln -s /root/.dotnet/dotnet /usr/bin/dotnet  # Create symlink to make dotnet command globally accessible
 
-# Ensure the dotnet binaries are available in the path
-ENV PATH="$PATH:/root/.dotnet"
+# Update PATH to include dotnet tools in the same layer where we install dotnet
+ENV PATH="$PATH:/root/.dotnet:/root/.dotnet/tools"
 
 # Verify .NET SDK installation
 RUN dotnet --version
@@ -44,15 +44,13 @@ RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.1553
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
 
-# Update PATH to include dotnet tools
-ENV PATH="$PATH:/root/.dotnet/tools"
-
 # Verify PowerShell and dotnet installation
 RUN dotnet --version
 RUN powershell --version
 
 # Switch back to non-root user
 USER $NB_UID
+
 
 
 
