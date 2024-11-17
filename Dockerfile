@@ -1,6 +1,9 @@
 # Base image with Jupyter
 FROM jupyter/base-notebook:latest
 
+# Switch to root to install system dependencies
+USER root
+
 # Update pip and install necessary Python packages
 RUN python -m pip install --upgrade pip
 COPY requirements.txt ./requirements.txt
@@ -19,9 +22,7 @@ RUN python -m pip install numpy spotipy scipy matplotlib ipython pandas sympy no
 RUN pip install nteract_on_jupyter
 
 # Install system dependencies for .NET Core SDK
-RUN apt-get update
-RUN apt-get install -y curl
-RUN apt-get install -y libicu66
+RUN apt-get update && apt-get install -y curl libicu66
 
 # Install .NET Core SDK
 RUN dotnet_sdk_version=3.1.301 \
@@ -63,6 +64,9 @@ RUN pip install jupyterlab-git
 
 # Rebuild JupyterLab to ensure the Git extension is available
 RUN jupyter lab build
+
+# Revert back to jovyan user
+USER jovyan
 
 # Expose the correct port for JupyterLab
 EXPOSE 8888
