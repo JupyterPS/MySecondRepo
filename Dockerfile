@@ -28,11 +28,16 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && apt-get update \
     && apt-get install -y powershell
 
-# Install .NET SDK via the official script
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
+# Install .NET SDK via the official script with debug output
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
+    && echo "Dotnet install script finished" \
+    && ls -l /root/.dotnet \
+    && echo "Dotnet installation check complete."
 
-# Debugging step: Check where dotnet is installed
-RUN echo "Dotnet is installed at: $(find /root/.dotnet -type f -name 'dotnet')" && ls -l /root/.dotnet/
+# Debug: Check the dotnet binary location explicitly
+RUN echo "Checking for dotnet binary in /root/.dotnet" \
+    && find /root/.dotnet -type f -name 'dotnet' \
+    && ls -l /root/.dotnet/
 
 # Add dotnet to PATH
 RUN echo "export PATH=\$PATH:/root/.dotnet:/root/.dotnet/tools" > /etc/profile.d/dotnet.sh \
@@ -54,3 +59,4 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
+
