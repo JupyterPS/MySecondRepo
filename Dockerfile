@@ -1,100 +1,75 @@
+# Use base image with Jupyter Notebook
 FROM jupyter/base-notebook:latest
 
+# Upgrade pip and install dependencies from requirements.txt
 RUN python -m pip install --upgrade pip
 COPY requirements.txt ./requirements.txt
-RUN python -m pip  install -r requirements.txt
-RUN python -m pip install --upgrade --no-deps --force-reinstall notebook 
+RUN python -m pip install -r requirements.txt
+RUN python -m pip install --upgrade --no-deps --force-reinstall notebook
 
-RUN python -m pip install jupyterlab_github
-RUN python -m pip install jupyterlab-git
+# Install JupyterLab extensions with versions
+RUN python -m pip install jupyterlab_github==0.1.0
+RUN python -m pip install jupyterlab-git==0.34.0
+RUN jupyter labextension install @jupyterlab/git@^5.0.0
 
-RUN jupyter labextension install @jupyterlab/git 
-#RUN jupyter labextension install sudo apt-get update@jupyterlab/to
+# Install Jupyter themes and contrib nbextensions with versions
+RUN python -m pip install jupyterthemes==0.20.0
+RUN python -m pip install jupyter_contrib_nbextensions==0.5.1
+RUN jupyter contrib nbextension install --user
+RUN jupyter nbextension enable codefolding/main
+RUN jupyter nbextension enable toc2/main
 
-RUN sudo apt-get update -S
-RUN apt-get install -y libicu66 -S
+# Install system dependencies for .NET and PowerShell
+RUN apt-get update -S
+RUN apt-get install -y libicu66 curl sudo
 
-RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose    
-
-RUN jupyter lab build 
-
-#Working Directory
-WORKDIR $HOME
-
-ARG NB_USER=jovyan
-ARG NB_UID=1000
-ENV USER ${NB_USER}
-ENV NB_UID ${NB_UID}
-ENV HOME /home/${NB_USER}
-
-WORKDIR ${HOME}
-
-USER root
+# Install PowerShell with specific version
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | tee /etc/apt/trusted.gpg.d/microsoft.asc
+RUN curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list | tee /etc/apt/sources.list.d/microsoft-prod.list
 RUN apt-get update
-RUN apt-get install -y curl
-
-RUN apt-get update
-RUN apt-get install -y libicu66
-
-ENV \
-    # Enable detection of running in a container
-    DOTNET_RUNNING_IN_CONTAINER=true \
-    # Enable correct mode for dotnet watch (only mode supported in a container)
-    DOTNET_USE_POLLING_FILE_WATCHER=true \
-    # Skip extraction of XML docs - generally not useful within an image/container - helps performance
-    NUGET_XMLDOC_MODE=skip \
-    # Opt out of telemetry until after we install jupyter when building the image, this prevents caching of machine id
-    DOTNET_TRY_CLI_TELEMETRY_OPTOUT=true
+RUN apt-get install -y powershell=7.1.5-1.ubuntu.20.04
 
 # Install .NET CLI dependencies
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        libc6 \
-        libgcc1 \
-        libgssapi-krb5-2 \
-        libicu66 \
-        libssl1.1 \
-        libstdc++6 \
-        zlib1g \
+        libc6 libgcc1 libgssapi-krb5-2 libicu66 libssl1.1 libstdc++6 zlib1g \
     && rm -rf /var/lib/apt/lists/*
 
-# Install .NET Core SDK
-RUN dotnet_sdk_version=3.1.301 \
+# Install .NET Core SDK with specific version
+RUN dotnet_sdk_version=5.0.202 \
     && curl -SL --output dotnet.tar.gz https://dotnetcli.azureedge.net/dotnet/Sdk/$dotnet_sdk_version/dotnet-sdk-$dotnet_sdk_version-linux-x64.tar.gz \
-    && dotnet_sha512='dd39931df438b8c1561f9a3bdb50f72372e29e5706d3fb4c490692f04a3d55f5acc0b46b8049bc7ea34dedba63c71b4c64c57032740cbea81eef1dce41929b4e' \
+    && dotnet_sha512='your_sha512_checksum' \
     && echo "$dotnet_sha512 dotnet.tar.gz" | sha512sum -c - \
     && mkdir -p /usr/share/dotnet \
     && tar -ozxf dotnet.tar.gz -C /usr/share/dotnet \
     && rm dotnet.tar.gz \
-    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
-    # Trigger first run experience by running arbitrary cmd
-    && dotnet help
+    && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
-# Copy notebooks
+# Install .NET Interactive for Jupyter
+RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
+
+# Ensure correct PATH for .NET tools
+ENV PATH="${PATH}:${HOME}/.dotnet/tools"
+
+# Ensure necessary directories for Jupyter kernels exist
+RUN mkdir -p /root/.local/share/jupyter/kernels/csharp && \
+    mkdir -p /root/.local/share/jupyter/kernels/fsharp && \
+    mkdir -p /root/.local/share/jupyter/kernels/powershell
+
+# Install Jupyter kernels
+RUN dotnet interactive jupyter install
+
+# Copy configuration files and notebooks
 COPY ./config ${HOME}/.jupyter/
 COPY ./ ${HOME}/Notebooks/
-
-# Copy package sources
 COPY ./NuGet.config ${HOME}/nuget.config
 
+# Set up user
 RUN chown -R ${NB_UID} ${HOME}
 USER ${USER}
 
-#Install nteract 
-RUN pip install nteract_on_jupyter
-
-# Install lastest build from master branch of Microsoft.DotNet.Interactive from myget
-#RUN dotnet tool install -g Microsoft.dotnet-interactive --version 1.0.131806 --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
-RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
- 
-ENV PATH="${PATH}:${HOME}/.dotnet/tools"
-RUN echo "$PATH"
-
-# Install kernel specs
-RUN dotnet interactive jupyter install
-
-# Enable telemetry once we install jupyter for the image
-ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
+# Install nteract
+RUN pip install nteract_on_jupyter==2.1.2
 
 # Set root to Notebooks
 WORKDIR ${HOME}/Notebooks/
