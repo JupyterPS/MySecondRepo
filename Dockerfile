@@ -22,14 +22,14 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install .NET SDK via the dotnet-install.sh script
+# Install .NET SDK via the dotnet-install.sh script and create symlink
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
     && ln -s /root/.dotnet/dotnet /usr/bin/dotnet  # Create symlink to make dotnet command globally accessible
 
 # Update PATH to include dotnet tools in the same layer where we install dotnet
-ENV PATH="$PATH:/root/.dotnet:/root/.dotnet/tools"
+ENV PATH="/root/.dotnet:/root/.dotnet/tools:${PATH}"
 
-# Verify .NET SDK installation
+# Verify .NET SDK installation by checking the version
 RUN dotnet --version
 
 # Install PowerShell
@@ -50,7 +50,6 @@ RUN powershell --version
 
 # Switch back to non-root user
 USER $NB_UID
-
 
 
 
