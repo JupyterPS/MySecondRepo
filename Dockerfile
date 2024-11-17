@@ -31,16 +31,15 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
 # Install .NET SDK via the official script
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin
 
-# Set the PATH environment variable to include dotnet
-ENV PATH="${PATH}:/root/.dotnet:/root/.dotnet/tools"
+# Explicitly set the path to the dotnet installation and verify installation
+RUN echo "export PATH=\$PATH:/root/.dotnet:/root/.dotnet/tools" >> ~/.bashrc && \
+    source ~/.bashrc && \
+    dotnet --version
 
 # Install dotnet tool globally: Microsoft.dotnet-interactive
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
-
-# Verify installation
-RUN dotnet --version
 
 # Set default user to jovyan (the original user in jupyter/base-notebook)
 USER jovyan
