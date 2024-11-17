@@ -28,11 +28,15 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && apt-get update \
     && apt-get install -y powershell
 
-# Install .NET SDK via the official script with debug output
+# Install .NET SDK and Runtime via the official script
 RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
     && echo "Dotnet install script finished" \
     && ls -l /home/jovyan/.dotnet \
     && echo "Dotnet installation check complete."
+
+# Install .NET Runtime explicitly to avoid missing runtime error
+RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet \
+    && echo "Dotnet runtime installation complete"
 
 # Debug: Check the dotnet binary location explicitly for jovyan
 RUN echo "Checking for dotnet binary in /home/jovyan/.dotnet" \
