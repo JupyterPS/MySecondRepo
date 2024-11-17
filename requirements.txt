@@ -1,8 +1,9 @@
-numpy
-matplotlib
-ipywidgets
-jupyter_contrib_nbextensions
-jupyterlab-git
-jupyterthemes
-spotipy
-scipy
+numpy==1.23.5
+matplotlib==3.7.0
+ipywidgets==7.6.5
+jupyter_contrib_nbextensions==0.5.1
+jupyterlab-git==0.34.0
+jupyterthemes==0.20.0
+spotipy==2.21.0
+scipy==1.10.1
+
