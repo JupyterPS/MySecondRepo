@@ -54,3 +54,8 @@ EXPOSE 8888
 
 # Set the entry point for the container to start JupyterLab
 CMD ["start-notebook.sh"]
+
+EXPOSE 8888
+
+# Set the entry point for the container to start JupyterLab
+CMD ["start-notebook.sh"]
