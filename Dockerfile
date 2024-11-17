@@ -1,19 +1,20 @@
+# Start with the base Jupyter image
 FROM jupyter/base-notebook:latest
 
-# Ensure running apt-get with root permissions
+# Ensure root permissions for system updates and installations
 USER root
 
-# Install necessary packages and libraries
+# Install necessary system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     libssl-dev \
-    libicu-dev \
     libssl3 \
+    libicu-dev \
     gnupg \
     lsb-release \
     && rm -rf /var/lib/apt/lists/*
 
-# Install .NET SDK
+# Install .NET Core SDK dependencies (version 3.1.301)
 RUN dotnet_sdk_version=3.1.301 \
     && curl -SL --output dotnet.tar.gz https://dotnetcli.azureedge.net/dotnet/Sdk/$dotnet_sdk_version/dotnet-sdk-$dotnet_sdk_version-linux-x64.tar.gz \
     && dotnet_sha512='dd39931df438b8c1561f9a3bdb50f72372e29e5706d3fb4c490692f04a3d55f5acc0b46b8049bc7ea34dedba63c71b4c64c57032740cbea81eef1dce41929b4e' \
@@ -22,49 +23,41 @@ RUN dotnet_sdk_version=3.1.301 \
     && tar -ozxf dotnet.tar.gz -C /usr/share/dotnet \
     && rm dotnet.tar.gz \
     && ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet \
-    # Trigger first run experience by running arbitrary cmd
-    && dotnet help
+    && dotnet --version
 
-# Install Microsoft .NET Interactive CLI tool
+# Install .NET interactive tool
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
 
-# Install nteract on Jupyter
-RUN pip install nteract_on_jupyter
+# Install additional Python libraries via pip
+RUN pip install --no-cache-dir \
+    nteract_on_jupyter \
+    jupyterlab-git \
+    spotipy \
+    scipy \
+    numpy \
+    pandas \
+    matplotlib \
+    ipython \
+    sympy \
+    nose
 
-# Install other Python dependencies
-COPY requirements.txt ./requirements.txt
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-
-# Copy notebook config and work directory
-COPY ./config ${HOME}/.jupyter/
-COPY ./ ${HOME}/Notebooks/
-
-# Set working directory and user permissions
-RUN chown -R jovyan ${HOME}
-
-# Switch back to jovyan user
-USER jovyan
-
-WORKDIR ${HOME}/Notebooks/
-
-# Build Jupyter Lab
-RUN jupyter lab build
-
-# Install JupyterLab extensions
+# Install Jupyter extensions
 RUN jupyter labextension install @jupyterlab/git
-RUN jupyter labextension install jupyterlab-github
 
-# Additional configurations
-ENV DOTNET_RUNNING_IN_CONTAINER=true \
-    DOTNET_USE_POLLING_FILE_WATCHER=true \
-    NUGET_XMLDOC_MODE=skip \
-    DOTNET_TRY_CLI_TELEMETRY_OPTOUT=true
+# Install any additional JupyterLab extensions
+RUN jupyter labextension install jupyterlab-git
 
-# Final setup (running as jovyan)
+# Install .NET Interactive Jupyter kernel
+RUN dotnet interactive jupyter install
+
+# Set environment variable for telemetry opt-out (optional)
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=true
+
+# Switch to non-root user (jovyan) for security
 USER jovyan
 
-# Set up environment variables for .NET Core usage
-ENV PATH="${PATH}:${HOME}/.dotnet/tools"
-RUN echo "$PATH"
-RUN dotnet interactive jupyter install
+# Expose the notebook's port
+EXPOSE 8888
+
+# Start the Jupyter notebook server
+CMD ["start-notebook.sh"]
