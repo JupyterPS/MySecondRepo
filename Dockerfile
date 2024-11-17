@@ -22,16 +22,14 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Add Microsoft's repository for PowerShell for Ubuntu 22.04 (Jammy)
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && apt-add-repository "deb https://packages.microsoft.com/ubuntu/22.04/prod jammy main" \
-    && apt-get update \
-    && apt-get install -y powershell
+# Install .NET 8.0 SDK and runtime via official Microsoft repositories
+RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
+    -O /etc/apt/sources.list.d/microsoft-prod.list && \
+    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    apt-get update && \
+    apt-get install -y dotnet-sdk-8.0
 
-# Install .NET SDK 8.0
-RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --version 8.0 --runtime dotnet
-
-# Install dotnet tool globally: Microsoft.dotnet-interactive
+# Install .NET tool globally: Microsoft.dotnet-interactive
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
@@ -52,6 +50,7 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
+
 
 
 
