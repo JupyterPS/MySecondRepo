@@ -33,8 +33,10 @@ RUN curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-ins
     && curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin --runtime dotnet \
     && echo "export PATH=\$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /home/jovyan/.bashrc
 
-# Set environment variable for .NET in non-interactive shell
-ENV PATH="/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools:${PATH}"
+# Explicitly set runtime path
+ENV PATH="/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools:$PATH"
+ENV DOTNET_ROOT="/home/jovyan/.dotnet"
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
 # Verify .NET installation and version
 RUN dotnet --version
@@ -52,6 +54,7 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
+
 
 
 
