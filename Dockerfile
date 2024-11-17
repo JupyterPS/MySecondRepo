@@ -23,7 +23,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && curl -sSL https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash /dev/stdin \
     && ln -s /root/.dotnet/dotnet /usr/bin/dotnet  # Create symlink to make dotnet command globally accessible \
-    && echo "export PATH=/root/.dotnet:/root/.dotnet/tools:$PATH" >> /etc/bash.bashrc \
+    && echo "export PATH=/root/.dotnet:/root/.dotnet/tools:$PATH" >> ~/.bashrc \
+    && source ~/.bashrc \
     && dotnet --version  # Verify dotnet is installed
 
 # Install PowerShell
@@ -44,6 +45,7 @@ RUN powershell --version
 
 # Switch back to non-root user
 USER $NB_UID
+
 
 
 
