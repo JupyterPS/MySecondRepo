@@ -59,4 +59,3 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
-
