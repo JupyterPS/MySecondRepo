@@ -36,6 +36,9 @@ RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
     apt-get update && \
     apt-get install -y dotnet-sdk-8.0
 
+# Create .dotnet/tools directory explicitly
+RUN mkdir -p /root/.dotnet/tools
+
 # Install .NET tool globally: Microsoft.dotnet-interactive
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
