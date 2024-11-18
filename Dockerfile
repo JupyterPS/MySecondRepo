@@ -46,8 +46,8 @@ ENV PATH="/root/.dotnet/tools:$PATH"
 # Run a simple command to refresh the shell environment and ensure tools are available
 RUN dotnet tool list -g && dotnet --version
 
-# Install dotnet-interactive Jupyter kernel
-RUN dotnet interactive jupyter install
+# Ensure the PATH is refreshed and invoke the dotnet-interactive kernel installation using bash
+RUN bash -c "dotnet interactive jupyter install"
 
 # Install the PowerShell kernel for Jupyter
 RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
