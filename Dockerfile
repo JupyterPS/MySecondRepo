@@ -38,12 +38,15 @@ RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
     apt-get install -y dotnet-sdk-8.0 dotnet-runtime-8.0 && \
     rm -rf /var/lib/apt/lists/*
 
-# Install .NET tool globally: Microsoft.dotnet-interactive
+# Switch to jovyan user for installing .NET interactive tools
+USER jovyan
+
+# Ensure the PATH for jovyan user includes the tools directory
+ENV PATH="/home/jovyan/.dotnet/tools:$PATH"
+
+# Install .NET interactive tool for jovyan user
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
-
-# Ensure that dotnet tools are available in PATH
-ENV PATH="/root/.dotnet/tools:$PATH"
 
 # Install the .NET interactive Jupyter kernel
 RUN dotnet interactive jupyter install
@@ -52,7 +55,7 @@ RUN dotnet interactive jupyter install
 RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
     pwsh -Command "Install-JupyterKernel"
 
-# Set the PATH to include .NET tools and runtime
+# Set the PATH to include .NET tools and runtime for Jupyter to pick up
 ENV PATH="/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools:$PATH"
 ENV DOTNET_ROOT="/home/jovyan/.dotnet"
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
@@ -62,9 +65,6 @@ RUN echo "export PATH=$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> 
     source /home/jovyan/.bashrc && \
     dotnet --version && \
     dotnet tool list -g
-
-# Switch back to the jovyan user (original user in jupyter/base-notebook)
-USER jovyan
 
 # Expose the Jupyter Notebook port
 EXPOSE 8888
