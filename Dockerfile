@@ -43,11 +43,12 @@ RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.1553
 # Set the PATH to include the .NET tools directory for the root user
 ENV PATH="/root/.dotnet/tools:$PATH"
 
-# Run a simple command to refresh the shell environment and ensure tools are available
+# Ensure the tool is installed by listing installed tools and dotnet version
 RUN dotnet tool list -g && dotnet --version
 
-# Ensure the PATH is refreshed and invoke the dotnet-interactive kernel installation using bash
-RUN bash -c "dotnet interactive jupyter install"
+# Check the location of dotnet-interactive and invoke the install command directly
+RUN which dotnet-interactive
+RUN /root/.dotnet/tools/dotnet-interactive jupyter install
 
 # Install the PowerShell kernel for Jupyter
 RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
