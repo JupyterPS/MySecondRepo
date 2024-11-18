@@ -9,7 +9,7 @@ ENV POWERSHELL_TELEMETRY_OPTOUT=1
 # Switch to root user to install system packages
 USER root
 
-# Install required dependencies for dotnet
+# Install required dependencies for dotnet and PowerShell
 RUN apt-get update && apt-get install -y \
     curl \
     libssl-dev \
@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     software-properties-common \
     unzip \
+    powershell \
     && rm -rf /var/lib/apt/lists/*
 
 # Install .NET 8.0 SDK and runtime via official Microsoft repositories
@@ -33,6 +34,10 @@ RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     && dotnet interactive jupyter install
+
+# Install the PowerShell kernel for Jupyter
+RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
+    pwsh -Command "Install-JupyterKernel"
 
 # Set the PATH to include .NET tools and runtime
 ENV PATH="/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools:$PATH"
