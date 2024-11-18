@@ -40,8 +40,13 @@ RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
 
 # Install .NET tool globally: Microsoft.dotnet-interactive
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
-    --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" && \
-    dotnet interactive jupyter install
+    --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
+
+# Ensure that dotnet tools are available in PATH
+ENV PATH="/root/.dotnet/tools:$PATH"
+
+# Install the .NET interactive Jupyter kernel
+RUN dotnet interactive jupyter install
 
 # Install the PowerShell kernel for Jupyter
 RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
