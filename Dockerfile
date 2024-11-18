@@ -1,4 +1,4 @@
-# Use official .NET 8 SDK image (includes .NET runtime and SDK)
+# Use official .NET 8 SDK image
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 # Install dependencies required for dotnet-interactive and Jupyter
@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install dotnet-interactive globally
-RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
+# Install dotnet-interactive globally but only in the specified path
+RUN dotnet tool install Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     --tool-path /usr/local/.dotnet/tools
 
