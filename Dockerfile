@@ -46,8 +46,14 @@ ENV PATH="/root/.dotnet/tools:$PATH"
 # Ensure the tool is installed by listing installed tools and dotnet version
 RUN dotnet tool list -g && dotnet --version
 
-# Use the absolute path for dotnet-interactive and try installing Jupyter kernel
-RUN /root/.dotnet/tools/dotnet-interactive jupyter install
+# Ensure PATH and directory are correct, and list the tools
+RUN echo "PATH is: $PATH" && \
+    echo "Listing /root/.dotnet/tools:" && \
+    ls -l /root/.dotnet/tools && \
+    dotnet tool list -g
+
+# Try using dotnet-interactive via dotnet CLI
+RUN dotnet interactive jupyter install
 
 # Install the PowerShell kernel for Jupyter
 RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
