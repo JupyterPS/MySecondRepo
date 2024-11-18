@@ -49,14 +49,19 @@ ENV PATH="/root/.dotnet/tools:$PATH"
 # Ensure the tool is installed by listing installed tools and dotnet version
 RUN dotnet tool list -g && dotnet --version
 
+# Explicitly ensure the path is available for subsequent commands by sourcing bashrc
+RUN echo "source /home/jovyan/.bashrc" >> /root/.bashrc
+
 # Ensure PATH and directory are correct, and list the tools
 RUN echo "PATH is: $PATH" && \
     echo "Listing /root/.dotnet/tools:" && \
     ls -l /root/.dotnet/tools && \
     dotnet tool list -g
 
-# Try using dotnet-interactive via dotnet CLI
-RUN dotnet interactive jupyter install
+# Reinstall dotnet-interactive tool and install the Jupyter kernel
+RUN dotnet tool uninstall --global Microsoft.dotnet-interactive && \
+    dotnet tool install --global Microsoft.dotnet-interactive && \
+    /root/.dotnet/tools/dotnet-interactive jupyter install
 
 # Install the PowerShell kernel for Jupyter
 RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
