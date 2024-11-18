@@ -82,9 +82,3 @@ EXPOSE 8888
 
 # Start Jupyter Notebook
 CMD ["start-notebook.sh"]
-
-# Expose the Jupyter Notebook port
-EXPOSE 8888
-
-# Start Jupyter Notebook
-CMD ["start-notebook.sh"]
