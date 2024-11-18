@@ -20,14 +20,8 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     software-properties-common \
     unzip \
+    powershell \
     && rm -rf /var/lib/apt/lists/*
-
-# Install PowerShell from the Microsoft repository
-RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
-    -O /etc/apt/sources.list.d/microsoft-prod.list && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    apt-get update && \
-    apt-get install -y powershell
 
 # Install .NET 8.0 SDK and runtime via official Microsoft repositories
 RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
