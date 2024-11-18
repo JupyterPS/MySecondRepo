@@ -58,9 +58,11 @@ RUN echo "PATH is: $PATH" && \
     ls -l /root/.dotnet/tools && \
     dotnet tool list -g
 
+# Manually delete the tools directory if already exists to avoid cross-device link error
+RUN rm -rf /root/.dotnet/tools
+
 # Reinstall dotnet-interactive tool and install the Jupyter kernel
-RUN dotnet tool uninstall --global Microsoft.dotnet-interactive && \
-    dotnet tool install --global Microsoft.dotnet-interactive && \
+RUN dotnet tool install --global Microsoft.dotnet-interactive && \
     /root/.dotnet/tools/dotnet-interactive jupyter install
 
 # Install the PowerShell kernel for Jupyter
