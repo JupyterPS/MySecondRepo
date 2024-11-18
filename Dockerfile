@@ -20,10 +20,19 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     software-properties-common \
     unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install .NET 8 SDK and runtime
+RUN apt-get update && apt-get install -y \
     dotnet-sdk-8.0 \
     dotnet-runtime-8.0 \
-    dotnet-runtime-3.1 \
     && rm -rf /var/lib/apt/lists/*
+
+# Install .NET Core 3.1 manually
+RUN wget https://download.visualstudio.microsoft.com/download/pr/17d566c0-dfc1-4e73-94ff-7ed2070e7a2d/af98cc2b7f39f58c0e5a31fc173da6e4/dotnet-runtime-3.1.32-linux-x64.tar.gz -O /tmp/dotnet-runtime-3.1.32-linux-x64.tar.gz \
+    && mkdir -p /usr/share/dotnet \
+    && tar -xzf /tmp/dotnet-runtime-3.1.32-linux-x64.tar.gz -C /usr/share/dotnet \
+    && rm /tmp/dotnet-runtime-3.1.32-linux-x64.tar.gz
 
 # Install PowerShell
 RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
