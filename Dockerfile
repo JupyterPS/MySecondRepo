@@ -36,34 +36,28 @@ RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
     apt-get update && \
     apt-get install -y dotnet-sdk-8.0
 
-# Create .dotnet/tools directory explicitly
-RUN mkdir -p /root/.dotnet/tools
+# Create a new directory for tools installation to avoid cross-device link issues
+RUN mkdir -p /usr/local/.dotnet/tools
 
-# Install .NET tool globally: Microsoft.dotnet-interactive
+# Install .NET tool globally: Microsoft.dotnet-interactive to the new directory
 RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
-    --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
+    --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
+    --tool-path /usr/local/.dotnet/tools
 
-# Set the PATH to include the .NET tools directory for the root user
-ENV PATH="/root/.dotnet/tools:$PATH"
+# Set the PATH to include the new tools directory
+ENV PATH="/usr/local/.dotnet/tools:$PATH"
 
 # Ensure the tool is installed by listing installed tools and dotnet version
 RUN dotnet tool list -g && dotnet --version
 
-# Explicitly ensure the path is available for subsequent commands by sourcing bashrc
-RUN echo "source /home/jovyan/.bashrc" >> /root/.bashrc
-
-# Ensure PATH and directory are correct, and list the tools
+# Ensure the directory is accessible and list tools installed
 RUN echo "PATH is: $PATH" && \
-    echo "Listing /root/.dotnet/tools:" && \
-    ls -l /root/.dotnet/tools && \
+    echo "Listing /usr/local/.dotnet/tools:" && \
+    ls -l /usr/local/.dotnet/tools && \
     dotnet tool list -g
 
-# Manually delete the tools directory if already exists to avoid cross-device link error
-RUN rm -rf /root/.dotnet/tools
-
-# Reinstall dotnet-interactive tool (this time without trying to uninstall) and install the Jupyter kernel
-RUN dotnet tool install --global Microsoft.dotnet-interactive && \
-    /root/.dotnet/tools/dotnet-interactive jupyter install
+# Install the Jupyter kernel for dotnet-interactive
+RUN /usr/local/.dotnet/tools/dotnet-interactive jupyter install
 
 # Install the PowerShell kernel for Jupyter
 RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
