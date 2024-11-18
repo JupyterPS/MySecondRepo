@@ -61,7 +61,7 @@ RUN echo "PATH is: $PATH" && \
 # Manually delete the tools directory if already exists to avoid cross-device link error
 RUN rm -rf /root/.dotnet/tools
 
-# Reinstall dotnet-interactive tool and install the Jupyter kernel
+# Reinstall dotnet-interactive tool (this time without trying to uninstall) and install the Jupyter kernel
 RUN dotnet tool install --global Microsoft.dotnet-interactive && \
     /root/.dotnet/tools/dotnet-interactive jupyter install
 
