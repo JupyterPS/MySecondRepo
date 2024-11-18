@@ -39,8 +39,8 @@ RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
 # Create a new directory for tools installation to avoid cross-device link issues
 RUN mkdir -p /usr/local/.dotnet/tools
 
-# Install .NET tool globally: Microsoft.dotnet-interactive to the new directory
-RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
+# Install .NET tool globally to the new directory (without --global option)
+RUN dotnet tool install Microsoft.dotnet-interactive --version 1.0.155302 \
     --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" \
     --tool-path /usr/local/.dotnet/tools
 
