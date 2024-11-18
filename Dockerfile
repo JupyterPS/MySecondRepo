@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     software-properties-common \
     unzip \
+    dotnet-runtime-8.0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PowerShell from the Microsoft repository
@@ -55,6 +56,9 @@ RUN echo "PATH is: $PATH" && \
     echo "Listing /usr/local/.dotnet/tools:" && \
     ls -l /usr/local/.dotnet/tools && \
     dotnet tool list -g
+
+# Set DOTNET_ROOT to use the correct version (8.0)
+ENV DOTNET_ROOT=/usr/share/dotnet
 
 # Install the Jupyter kernel for dotnet-interactive
 RUN /usr/local/.dotnet/tools/dotnet-interactive jupyter install
