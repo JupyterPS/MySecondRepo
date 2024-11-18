@@ -1,45 +1,61 @@
-# Step 1: Base image setup
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS base
+# Use Jupyter's base image
+FROM jupyter/base-notebook:latest
 
-# Step 2: Update and install dependencies
+# Set environment variables to skip telemetry
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+ENV POWERSHELL_TELEMETRY_OPTOUT=1
+
+# Switch to root user to install system packages
+USER root
+
+# Install required dependencies for dotnet and PowerShell
 RUN apt-get update && apt-get install -y \
     curl \
-    gnupg \
-    lsb-release \
-    apt-transport-https \
-    software-properties-common \
     libssl-dev \
     libicu-dev \
-    unzip \
+    gnupg \
+    lsb-release \
     wget \
+    apt-transport-https \
+    software-properties-common \
+    unzip \
+    powershell \
     && rm -rf /var/lib/apt/lists/*
 
-# Step 3: Install .NET Core 3.1 runtime manually
-RUN wget https://download.visualstudio.microsoft.com/download/pr/ff4f37d9-3b45-4d57-bbd5-dc57e1b2b38d/404e772be1c0f4189fbb65efadfe9ed1/dotnet-runtime-3.1.32-linux-x64.tar.gz -O /tmp/dotnet-runtime-3.1.32-linux-x64.tar.gz \
-    && mkdir -p /usr/share/dotnet \
-    && tar -xzf /tmp/dotnet-runtime-3.1.32-linux-x64.tar.gz -C /usr/share/dotnet \
-    && rm /tmp/dotnet-runtime-3.1.32-linux-x64.tar.gz
+# Install .NET 8.0 SDK and runtime via official Microsoft repositories
+RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
+    -O /etc/apt/sources.list.d/microsoft-prod.list && \
+    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
+    apt-get update && \
+    apt-get install -y dotnet-sdk-8.0 dotnet-runtime-8.0 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Step 4: Install .NET Interactive globally
-RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" --tool-path /usr/local/.dotnet/tools
+# Install .NET tool globally: Microsoft.dotnet-interactive
+RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
+    --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json" && \
+    dotnet interactive jupyter install
 
-# Step 5: Install Jupyter for .NET interactive
-RUN /usr/local/.dotnet/tools/dotnet-interactive jupyter install
+# Install the PowerShell kernel for Jupyter
+RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
+    pwsh -Command "Install-JupyterKernel"
 
-# Step 6: Set environment variables
-ENV PATH="${PATH}:/usr/local/.dotnet/tools"
+# Set the PATH to include .NET tools and runtime
+ENV PATH="/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools:$PATH"
+ENV DOTNET_ROOT="/home/jovyan/.dotnet"
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
-# Step 7: Install required Python packages (for Jupyter compatibility)
-RUN apt-get update && apt-get install -y \
-    python3-pip \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Force the shell to recognize the new environment variables and tools
+RUN echo "export PATH=$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /home/jovyan/.bashrc && \
+    source /home/jovyan/.bashrc && \
+    dotnet --version && \
+    dotnet tool list -g
 
-# Step 8: Install Jupyter Notebook
-RUN pip3 install --no-cache-dir jupyter
+# Switch back to the jovyan user (original user in jupyter/base-notebook)
+USER jovyan
 
-# Step 9: Expose port for Jupyter Notebook
+# Expose the Jupyter Notebook port
 EXPOSE 8888
 
-# Step 10: Start Jupyter Notebook with .NET interactive support
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.password=''"]
+# Start Jupyter Notebook
+CMD ["start-notebook.sh"]
