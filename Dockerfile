@@ -1,73 +1,13 @@
-# Use Jupyter's base image
-FROM jupyter/base-notebook:latest
-
-# Set environment variables to skip telemetry
-ENV DEBIAN_FRONTEND=noninteractive
-ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
-ENV POWERSHELL_TELEMETRY_OPTOUT=1
-
-# Switch to root user to install system packages
-USER root
-
-# Install required dependencies for dotnet and PowerShell
-RUN apt-get update && apt-get install -y \
-    curl \
-    libssl-dev \
-    libicu-dev \
-    gnupg \
-    lsb-release \
-    wget \
-    apt-transport-https \
-    software-properties-common \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
-
-# Add Microsoft package repository for PowerShell and .NET
-RUN wget -q "https://packages.microsoft.com/config/debian/10/prod.list" -O /etc/apt/sources.list.d/microsoft-prod.list && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    apt-get update
-
-# Install PowerShell from Microsoft's repository
-RUN apt-get install -y powershell
-
-# Install .NET 8.0 SDK and runtime via official Microsoft repositories
+# Install .NET 8.0 SDK and runtime
 RUN wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list \
     -O /etc/apt/sources.list.d/microsoft-prod.list && \
     curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
     apt-get update && \
-    apt-get install -y dotnet-sdk-8.0 dotnet-runtime-8.0 && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y dotnet-sdk-8.0 dotnet-runtime-8.0
 
-# Switch to jovyan user for installing .NET interactive tools
-USER jovyan
-
-# Ensure the PATH for jovyan user includes the tools directory
-ENV PATH="/home/jovyan/.dotnet/tools:$PATH"
-
-# Install .NET interactive tool for jovyan user
-RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 \
-    --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
-
-# Install the .NET interactive Jupyter kernel
-RUN dotnet interactive jupyter install
-
-# Install the PowerShell kernel for Jupyter
-RUN pwsh -Command "Install-Module -Name Jupyter -Force" && \
-    pwsh -Command "Install-JupyterKernel"
-
-# Set the PATH to include .NET tools and runtime for Jupyter to pick up
-ENV PATH="/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools:$PATH"
-ENV DOTNET_ROOT="/home/jovyan/.dotnet"
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
-
-# Force the shell to recognize the new environment variables and tools
-RUN echo "export PATH=$PATH:/home/jovyan/.dotnet:/home/jovyan/.dotnet/tools" >> /home/jovyan/.bashrc && \
-    source /home/jovyan/.bashrc && \
-    dotnet --version && \
-    dotnet tool list -g
-
-# Expose the Jupyter Notebook port
-EXPOSE 8888
-
-# Start Jupyter Notebook
-CMD ["start-notebook.sh"]
+# Install .NET Core 3.1 runtime for compatibility with dotnet-interactive
+RUN wget https://download.visualstudio.microsoft.com/download/pr/1a6b7f1c-1b78-4b5c-93c9-1b27d8e8da7f/c1cd27f7c3464f0c2c0a24b96a1a59b5/dotnet-runtime-3.1.32-linux-x64.tar.gz \
+    -O /tmp/dotnet-runtime-3.1.32-linux-x64.tar.gz && \
+    mkdir -p /usr/share/dotnet && \
+    tar -xzf /tmp/dotnet-runtime-3.1.32-linux-x64.tar.gz -C /usr/share/dotnet && \
+    rm /tmp/dotnet-runtime-3.1.32-linux-x64.tar.gz
