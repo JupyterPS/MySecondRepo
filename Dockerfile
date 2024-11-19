@@ -14,7 +14,7 @@ RUN python -m pip install jupyterlab-git
 # Step 4: Install JupyterLab git extension
 RUN jupyter labextension install @jupyterlab/git
 
- # Install PowerShell
+# Install PowerShell
 RUN apt-get update && apt-get install -y powershell 
 
 # Step 5: Update system and install libraries
