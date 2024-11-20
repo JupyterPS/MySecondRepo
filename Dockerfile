@@ -104,11 +104,3 @@ ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
 # Step 21: Set the working directory to Notebooks
 WORKDIR ${HOME}/Notebooks/
- 
-
-
-
- 
-
- 
- 
