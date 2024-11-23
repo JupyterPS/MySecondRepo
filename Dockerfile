@@ -1,90 +1,79 @@
-# Step 1: Start from Jupyter base notebook for the final repository
+# Step 1: Start from the official .NET SDK image
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS dotnet
+
+# Step 2: Create a new base image from the Jupyter base-notebook
 FROM jupyter/base-notebook:latest
 
-# Step 2: Upgrade pip and install required dependencies from requirements.txt
-RUN python -m pip install --upgrade pip
-COPY requirements.txt ./requirements.txt
-RUN python -m pip install -r requirements.txt
-RUN python -m pip install --upgrade --no-deps --force-reinstall notebook 
-
-# Step 3: Install JupyterLab extensions
-RUN python -m pip install jupyterlab_github jupyterlab-git
-
-# Step 4: Install PowerShell
+# Step 3: Switch to root user to install additional dependencies
 USER root
-RUN mkdir -p /var/lib/apt/lists/partial && \
-    apt-get clean && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-    wget apt-transport-https software-properties-common && \
-    wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    apt-get update && \
-    apt-get install -y powershell
 
-# Step 5: Update system and install libraries
-RUN apt-get update && apt-get install -y libicu-dev libssl-dev
+# Step 4: Clear Docker cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Step 6: Install additional Python dependencies
-RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose
+# Step 5: Install required packages, n package manager, and Node.js
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-dev \
+    curl \
+    libicu-dev \
+    build-essential \
+    wget \
+    libssl-dev \
+    && curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n \
+    && chmod +x /usr/local/bin/n \
+    && n 14.17.0 \
+    && python3 -m pip install --upgrade pip \
+    && python3 -m pip install notebook numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose
 
-# Step 7: Build JupyterLab
-RUN jupyter lab build 
+# Step 6: Install JupyterLab separately to avoid memory issues
+RUN python3 -m pip install jupyterlab
 
-# Step 8: Set user-related environment variables
-ARG NB_USER=jovyan
-ARG NB_UID=1000
-ENV USER ${NB_USER}
-ENV NB_UID ${NB_UID}
-ENV HOME /home/${NB_USER}
+# Step 7: Install .NET Runtime 3.1 using the official installation script
+RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 3.1 --install-dir /usr/share/dotnet
 
-# Step 9: Switch to root user to install additional dependencies
-USER root
-RUN apt-get update
-RUN apt-get install -y curl
+# Step 8: Install .NET Runtime 6.0 using the official installation script
+RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --install-dir /usr/share/dotnet
 
-# Step 10: Install .NET CLI dependencies
-RUN apt-get update && apt-get install -y libicu-dev libssl-dev
+# Step 9: Install .NET Interactive tool
+RUN /usr/share/dotnet/dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302
 
-# Step 11: Set environment variables for .NET container setup
-ENV \
-    DOTNET_RUNNING_IN_CONTAINER=true \
-    DOTNET_USE_POLLING_FILE_WATCHER=true \
-    NUGET_XMLDOC_MODE=skip \
-    DOTNET_TRY_CLI_TELEMETRY_OPTOUT=true
+# Step 10: Set PATH to include .dotnet/tools
+ENV PATH="$PATH:/root/.dotnet/tools:/home/jovyan/.dotnet/tools"
 
-# Step 12: Add Microsoft package repository and install .NET SDK
-RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    apt-get update && \
-    apt-get install -y dotnet-sdk-3.1
+# Step 11: Ensure dotnet-interactive is installed
+RUN dotnet-interactive --version
 
-# Step 13: Copy notebooks and configuration files
-COPY ./config ${HOME}/.jupyter/
-COPY ./ ${HOME}/Notebooks/
-COPY ./NuGet.config ${HOME}/nuget.config
+# Step 12: Install the .NET Interactive kernels (including PowerShell)
+RUN dotnet-interactive jupyter install
 
-# Step 14: Change ownership to jovyan user
-RUN chown -R ${NB_UID}:${NB_UID} ${HOME}
+# Step 13: Set the working directory
+WORKDIR /home/jovyan
 
-# Step 15: Switch back to jovyan user
-USER ${NB_USER}
+# Step 14: Copy configuration files and notebooks
+COPY ./config /home/jovyan/.jupyter/
+COPY ./ /home/jovyan/WindowsPowerShell/
+COPY ./NuGet.config /home/jovyan/nuget.config
+
+# Step 15: Change ownership to jovyan user
+RUN chown -R jovyan:users /home/jovyan
 
 # Step 16: Install nteract for Jupyter
 RUN pip install nteract_on_jupyter
 
-# Step 17: Install .NET Interactive globally
-RUN dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302 --add-source "https://dotnet.myget.org/F/dotnet-try/api/v3/index.json"
+# Step 17: Switch back to jovyan user
+USER jovyan
 
-# Step 18: Update PATH with .NET tools directory
-ENV PATH="${PATH}:${HOME}/.dotnet/tools"
-RUN echo "$PATH"
-
-# Step 19: Install Jupyter Kernel for .NET Interactive
-RUN dotnet interactive jupyter install
-
-# Step 20: Enable telemetry after installing Jupyter
+# Step 18: Enable telemetry
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
-# Step 21: Set the working directory to Notebooks
-WORKDIR ${HOME}/Notebooks/
+# Step 19: Install JupyterLab git extension
+RUN jupyter labextension install @jupyterlab/git
+
+# Step 20: Clean up and install JupyterLab extensions
+RUN jupyter labextension install @jupyterlab/github
+
+# Step 21: Install PowerShell
+RUN apt-get update && apt-get install -y powershell
+
+# Step 22: Final working directory
+WORKDIR /home/jovyan/WindowsPowerShell/
