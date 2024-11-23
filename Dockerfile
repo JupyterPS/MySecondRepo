@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     wget \
     libssl-dev \
+    git \
     && curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n \
     && chmod +x /usr/local/bin/n \
     && n 14.17.0 \
@@ -75,8 +76,8 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
     apt-get update && \
     apt-get install -y powershell
 
-# Step 21: Set correct permissions for dotnet
-RUN chmod -R 755 /usr/share/dotnet
+# Step 21: Set correct permissions and ownership for dotnet
+RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
 
 # Step 22: Switch back to jovyan user
 USER jovyan
