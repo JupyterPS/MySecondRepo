@@ -79,8 +79,13 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
 # Step 21: Set correct permissions and ownership for dotnet
 RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
 
-# Step 22: Switch back to jovyan user
+# Step 22: Ensure .dotnet/tools directory permissions and ownership
+RUN mkdir -p /home/jovyan/.dotnet/tools && \
+    chmod -R 755 /home/jovyan/.dotnet && \
+    chown -R jovyan:users /home/jovyan/.dotnet
+
+# Step 23: Switch back to jovyan user
 USER jovyan
 
-# Step 23: Final working directory
+# Step 24: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
