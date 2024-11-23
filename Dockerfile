@@ -8,11 +8,10 @@ RUN python -m pip install -r requirements.txt
 RUN python -m pip install --upgrade --no-deps --force-reinstall notebook 
 
 # Step 3: Install JupyterLab extensions
-RUN python -m pip install jupyterlab_github
-RUN python -m pip install jupyterlab-git
+RUN python -m pip install jupyterlab_github jupyterlab-git
 
-# Step 4: Install JupyterLab git extension
-RUN jupyter labextension install @jupyterlab/git
+# Step 4: (Remove deprecated command for labextension install)
+#RUN jupyter labextension install @jupyterlab/git
 
 # Step 5: Install PowerShell
 RUN apt-get update && apt-get install -y powershell 
