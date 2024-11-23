@@ -23,7 +23,7 @@ RUN mkdir -p /var/lib/apt/lists/partial && \
     apt-get install -y powershell
 
 # Step 5: Update system and install libraries
-RUN apt-get update && apt-get install -y libicu-dev
+RUN apt-get update && apt-get install -y libicu-dev libssl1.0-dev
 
 # Step 6: Install additional Python dependencies
 RUN python -m pip install --user numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose
@@ -44,7 +44,7 @@ RUN apt-get update
 RUN apt-get install -y curl
 
 # Step 10: Install .NET CLI dependencies
-RUN apt-get update && apt-get install -y libicu-dev
+RUN apt-get update && apt-get install -y libicu-dev libssl1.0-dev
 
 # Step 11: Set environment variables for .NET container setup
 ENV \
@@ -60,7 +60,7 @@ RUN apt-get update \
         libgcc1 \
         libgssapi-krb5-2 \
         libicu-dev \
-        libssl1.1 \
+        libssl1.0-dev \
         libstdc++6 \
         zlib1g \
     && rm -rf /var/lib/apt/lists/*
