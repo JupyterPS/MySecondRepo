@@ -58,7 +58,7 @@ COPY ./NuGet.config /home/jovyan/nuget.config
 RUN chown -R jovyan:users /home/jovyan
 
 # Step 16: Install nteract for Jupyter
-RUN pip install nteract_on_jupyter
+RUN python3 -m pip install nteract_on_jupyter
 
 # Step 17: Switch back to jovyan user
 USER jovyan
@@ -66,14 +66,17 @@ USER jovyan
 # Step 18: Enable telemetry
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
-# Step 19: Install JupyterLab git extension
-RUN jupyter labextension install @jupyterlab/git
+# Step 19: Install JupyterLab git extension using pip
+RUN pip install jupyterlab-git
 
-# Step 20: Clean up and install JupyterLab extensions
-RUN jupyter labextension install @jupyterlab/github
+# Step 20: Install JupyterLab GitHub extension using pip
+RUN pip install jupyterlab_github
 
-# Step 21: Install PowerShell
+# Step 21: Switch back to root user
+USER root
+
+# Step 22: Ensure apt-get commands run with the proper permissions and install PowerShell
 RUN apt-get update && apt-get install -y powershell
 
-# Step 22: Final working directory
+# Step 23: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
