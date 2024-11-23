@@ -75,8 +75,11 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
     apt-get update && \
     apt-get install -y powershell
 
-# Step 21: Switch back to jovyan user
+# Step 21: Set correct permissions for dotnet
+RUN chmod -R 755 /usr/share/dotnet
+
+# Step 22: Switch back to jovyan user
 USER jovyan
 
-# Step 22: Final working directory
+# Step 23: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
