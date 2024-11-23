@@ -69,8 +69,11 @@ RUN python3 -m pip install jupyterlab-git
 # Step 19: Install JupyterLab GitHub extension using pip as root
 RUN python3 -m pip install jupyterlab_github
 
-# Step 20: Install PowerShell
-RUN apt-get update && apt-get install -y powershell
+# Step 20: Add Microsoft repository and install PowerShell
+RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    apt-get update && \
+    apt-get install -y powershell
 
 # Step 21: Switch back to jovyan user
 USER jovyan
