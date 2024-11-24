@@ -25,10 +25,7 @@ RUN apt-get update && apt-get install -y \
     && chmod +x /usr/local/bin/n \
     && n 14.17.0 \
     && python3 -m pip install --upgrade pip \
-    && python3 -m pip install notebook numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose \
-    && python3 -m pip install jupyter_contrib_nbextensions \
-    && jupyter contrib nbextension install --sys-prefix \
-    && jupyter nbextensions_configurator enable --sys-prefix
+    && python3 -m pip install notebook numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose
 
 # Step 6: Install JupyterLab separately to avoid memory issues
 RUN python3 -m pip install jupyterlab
@@ -108,7 +105,7 @@ RUN sudo dotnet --info
 # Step 27: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
 
-# Step 28: Add logging configuration and additional environment settings
+# Step 28: Add logging configuration
 RUN mkdir -p /home/jovyan/.jupyter && \
     echo "c.NotebookApp.log_level = 'DEBUG'" > /home/jovyan/.jupyter/jupyter_notebook_config.py && \
     echo "c.NotebookApp.log_file = '/home/jovyan/.jupyter/jupyter.log'" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
