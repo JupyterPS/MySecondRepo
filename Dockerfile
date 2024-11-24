@@ -109,9 +109,15 @@ RUN sudo dotnet --info
 # Step 28: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
 
-# Step 29: Add logging configuration
+# Step 29: Add logging configuration and extended timeout
 RUN mkdir -p /home/jovyan/.jupyter && \
-    echo "c.NotebookApp.log_level = 'DEBUG'" > /home/jovyan/.jupyter/jupyter_notebook_config.py
+    echo "c.NotebookApp.log_level = 'DEBUG'" > /home/jovyan/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.log_file = '/home/jovyan/.jupyter/jupyter.log'" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.ip = '0.0.0.0'" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.open_browser = False" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
+    echo "c.NotebookApp.shutdown_no_activity_timeout = 600" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
+    echo "c.MappingKernelManager.cull_interval = 600" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
+    echo "c.MappingKernelManager.cull_idle_timeout = 600" >> /home/jovyan/.jupyter/jupyter_notebook_config.py
 
 # Step 30: Add a command to view logs after start
 CMD tail -f /home/jovyan/.jupyter/jupyter.log
