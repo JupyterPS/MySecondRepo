@@ -39,68 +39,71 @@ RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.
 # Step 9: Set correct permissions and ownership for dotnet
 RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
 
-# Step 10: Switch to jovyan user for dotnet tool installation
+# Step 10: Create symbolic links to make dotnet commands available
+RUN ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+
+# Step 11: Switch to jovyan user for dotnet tool installation
 USER jovyan
 
-# Step 11: Install .NET Interactive tool
+# Step 12: Install .NET Interactive tool
 RUN /usr/share/dotnet/dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302
 
-# Step 12: Add .dotnet/tools to PATH for jovyan user
+# Step 13: Add .dotnet/tools to PATH for jovyan user
 ENV PATH="/home/jovyan/.dotnet/tools:/usr/share/dotnet:${PATH}"
 
-# Step 13: Verify dotnet and dotnet-interactive installations
+# Step 14: Verify dotnet and dotnet-interactive installations
 RUN echo $PATH
 RUN ls -la /home/jovyan/.dotnet/tools
 RUN ls -la /usr/share/dotnet
-RUN /home/jovyan/.dotnet/tools/dotnet-interactive --version
-RUN /usr/share/dotnet/dotnet --info
+RUN dotnet --info
+RUN dotnet-interactive --version
 
-# Step 14: Install the .NET Interactive kernels (including PowerShell)
-RUN /home/jovyan/.dotnet/tools/dotnet-interactive jupyter install
+# Step 15: Install the .NET Interactive kernels (including PowerShell)
+RUN dotnet-interactive jupyter install
 
-# Step 15: Set the working directory
+# Step 16: Set the working directory
 WORKDIR /home/jovyan
 
-# Step 16: Copy configuration files and notebooks with correct ownership
+# Step 17: Copy configuration files and notebooks with correct ownership
 COPY --chown=jovyan:users ./config /home/jovyan/.jupyter/
 COPY --chown=jovyan:users ./ /home/jovyan/WindowsPowerShell/
 COPY --chown=jovyan:users ./NuGet.config /home/jovyan/nuget.config
 
-# Step 17: Ensure permissions for .dotnet/tools directory
+# Step 18: Ensure permissions for .dotnet/tools directory
 RUN mkdir -p /home/jovyan/.dotnet/tools && \
     chmod -R 755 /home/jovyan/.dotnet && \
     chown -R jovyan:users /home/jovyan/.dotnet
 
-# Step 18: Install nteract for Jupyter
+# Step 19: Install nteract for Jupyter
 RUN python3 -m pip install nteract_on_jupyter
 
-# Step 19: Enable telemetry
+# Step 20: Enable telemetry
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
-# Step 20: Install JupyterLab git extension using pip as root
+# Step 21: Install JupyterLab git extension using pip as root
 USER root
 RUN python3 -m pip install jupyterlab-git
 
-# Step 21: Install JupyterLab GitHub extension using pip as root
+# Step 22: Install JupyterLab GitHub extension using pip as root
 RUN python3 -m pip install jupyterlab_github
 
-# Step 22: Add Microsoft repository and install PowerShell
+# Step 23: Add Microsoft repository and install PowerShell
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
     apt-get install -y powershell
 
-# Step 23: Set permissions for dotnet commands
+# Step 24: Set permissions for dotnet commands
 RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
 
-# Step 24: Add jovyan to sudoers
+# Step 25: Add jovyan to sudoers
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# Step 25: Switch back to jovyan user
+# Step 26: Switch back to jovyan user
 USER jovyan
 
-# Step 26: Test dotnet command
+# Step 27: Test dotnet command
 RUN sudo dotnet --info
 
-# Step 27: Final working directory
+# Step 28: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
