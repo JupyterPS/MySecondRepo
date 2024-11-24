@@ -24,10 +24,10 @@ RUN apt-get update && apt-get install -y \
     && chmod +x /usr/local/bin/n \
     && n 14.17.0 \
     && python3 -m pip install --upgrade pip \
-    && python3 -m pip install --upgrade notebook numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose
+    && python3 -m pip install notebook numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose
 
 # Step 6: Install JupyterLab separately to avoid memory issues
-RUN python3 -m pip install --upgrade jupyterlab
+RUN python3 -m pip install jupyterlab
 
 # Step 7: Install .NET Runtime 3.1 using the official installation script
 RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 3.1 --install-dir /usr/share/dotnet
@@ -35,52 +35,58 @@ RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 3.
 # Step 8: Install .NET Runtime 6.0 using the official installation script
 RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --install-dir /usr/share/dotnet
 
-# Step 9: Install .NET Interactive tool
+# Step 9: Set correct permissions and ownership for dotnet
+RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
+
+# Step 10: Switch back to jovyan user to install dotnet tools
+USER jovyan
+
+# Step 11: Install .NET Interactive tool
 RUN /usr/share/dotnet/dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302
 
-# Step 10: Set PATH to include .dotnet/tools
+# Step 12: Set PATH to include .dotnet/tools
 ENV PATH="$PATH:/root/.dotnet/tools:/home/jovyan/.dotnet/tools"
 
-# Step 11: Ensure dotnet-interactive is installed
+# Step 13: Ensure dotnet-interactive is installed
 RUN dotnet-interactive --version
 
-# Step 12: Install the .NET Interactive kernels (including PowerShell)
+# Step 14: Install the .NET Interactive kernels (including PowerShell)
 RUN dotnet-interactive jupyter install
 
-# Step 13: Set the working directory
+# Step 15: Set the working directory
 WORKDIR /home/jovyan
 
-# Step 14: Copy configuration files and notebooks with correct ownership
+# Step 16: Copy configuration files and notebooks with correct ownership
 COPY --chown=jovyan:users ./config /home/jovyan/.jupyter/
 COPY --chown=jovyan:users ./ /home/jovyan/WindowsPowerShell/
 COPY --chown=jovyan:users ./NuGet.config /home/jovyan/nuget.config
 
-# Step 15: Ensure permissions for .dotnet/tools directory
+# Step 17: Ensure permissions for .dotnet/tools directory
 RUN mkdir -p /home/jovyan/.dotnet/tools && \
     chmod -R 755 /home/jovyan/.dotnet && \
     chown -R jovyan:users /home/jovyan/.dotnet
 
-# Step 16: Install nteract for Jupyter
-RUN python3 -m pip install --upgrade nteract_on_jupyter
+# Step 18: Install nteract for Jupyter
+RUN python3 -m pip install nteract_on_jupyter
 
-# Step 17: Enable telemetry
+# Step 19: Enable telemetry
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
-# Step 18: Install JupyterLab git extension using pip as root
+# Step 20: Install JupyterLab git extension using pip as root
 USER root
-RUN python3 -m pip install --upgrade jupyterlab-git
+RUN python3 -m pip install jupyterlab-git
 
-# Step 19: Install JupyterLab GitHub extension using pip as root
-RUN python3 -m pip install --upgrade jupyterlab_github
+# Step 21: Install JupyterLab GitHub extension using pip as root
+RUN python3 -m pip install jupyterlab_github
 
-# Step 20: Add Microsoft repository and install PowerShell
+# Step 22: Add Microsoft repository and install PowerShell
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
     apt-get install -y powershell
 
-# Step 21: Switch back to jovyan user
+# Step 23: Switch back to jovyan user
 USER jovyan
 
-# Step 22: Final working directory
+# Step 24: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
