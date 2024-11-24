@@ -61,56 +61,60 @@ RUN dotnet-interactive --version
 # Step 15: Install the .NET Interactive kernels (including PowerShell)
 RUN dotnet-interactive jupyter install
 
-# Step 16: Set the working directory
+# Step 16: Install PowerShell kernel
+RUN pip install powershell_kernel
+RUN python -m powershell_kernel.install
+
+# Step 17: Set the working directory
 WORKDIR /home/jovyan
 
-# Step 17: Copy configuration files and notebooks with correct ownership
+# Step 18: Copy configuration files and notebooks with correct ownership
 COPY --chown=jovyan:users ./config /home/jovyan/.jupyter/
 COPY --chown=jovyan:users ./ /home/jovyan/WindowsPowerShell/
 COPY --chown=jovyan:users ./NuGet.config /home/jovyan/nuget.config
 
-# Step 18: Ensure permissions for .dotnet/tools directory
+# Step 19: Ensure permissions for .dotnet/tools directory
 RUN mkdir -p /home/jovyan/.dotnet/tools && \
     chmod -R 755 /home/jovyan/.dotnet && \
     chown -R jovyan:users /home/jovyan/.dotnet
 
-# Step 19: Install nteract for Jupyter
+# Step 20: Install nteract for Jupyter
+USER root
 RUN python3 -m pip install nteract_on_jupyter
 
-# Step 20: Enable telemetry
+# Step 21: Enable telemetry
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
-# Step 21: Install JupyterLab git extension using pip as root
-USER root
+# Step 22: Install JupyterLab git extension using pip as root
 RUN python3 -m pip install jupyterlab-git
 
-# Step 22: Install JupyterLab GitHub extension using pip as root
+# Step 23: Install JupyterLab GitHub extension using pip as root
 RUN python3 -m pip install jupyterlab_github
 
-# Step 23: Add Microsoft repository and install PowerShell
+# Step 24: Add Microsoft repository and install PowerShell
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
     apt-get install -y powershell
 
-# Step 24: Add jovyan to sudoers
+# Step 25: Add jovyan to sudoers
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# Step 25: Switch back to jovyan user
+# Step 26: Switch back to jovyan user
 USER jovyan
 
-# Step 26: Test dotnet command
+# Step 27: Test dotnet command
 RUN sudo dotnet --info
 
-# Step 27: Final working directory
+# Step 28: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
 
-# Step 28: Add logging configuration
+# Step 29: Add logging configuration
 RUN mkdir -p /home/jovyan/.jupyter && \
     echo "c.NotebookApp.log_level = 'DEBUG'" > /home/jovyan/.jupyter/jupyter_notebook_config.py
 
-# Step 29: Add a command to view logs after start
+# Step 30: Add a command to view logs after start
 CMD tail -f /home/jovyan/.jupyter/jupyter.log
 
-# Step 30: Run Jupyter Notebook and ensure logs capture kernel activity
+# Step 31: Run Jupyter Notebook and ensure logs capture kernel activity
 CMD jupyter notebook --allow-root --no-browser --ip=0.0.0.0 --port=8888 --NotebookApp.log_level=DEBUG --NotebookApp.log_file=/home/jovyan/.jupyter/jupyter.log
