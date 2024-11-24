@@ -104,6 +104,3 @@ RUN sudo dotnet --info
 
 # Step 27: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
-
-# Step 28: Copy Jupyter configuration
-COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
