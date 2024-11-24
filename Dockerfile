@@ -118,6 +118,3 @@ RUN mkdir -p /home/jovyan/.jupyter && \
     echo "c.NotebookApp.shutdown_no_activity_timeout = 600" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
     echo "c.MappingKernelManager.cull_interval = 600" >> /home/jovyan/.jupyter/jupyter_notebook_config.py && \
     echo "c.MappingKernelManager.cull_idle_timeout = 600" >> /home/jovyan/.jupyter/jupyter_notebook_config.py
-
-# Step 30: Add a command to view logs after start
-CMD tail -f /home/jovyan/.jupyter/jupyter.log & jupyter notebook --allow-root --no-browser --ip=0.0.0.0 --port=8888 --NotebookApp.log_level=DEBUG --NotebookApp.log_file=/home/jovyan/.jupyter/jupyter.log
