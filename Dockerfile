@@ -39,8 +39,8 @@ RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.
 # Step 9: Install .NET Interactive tool
 RUN /usr/share/dotnet/dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302
 
-# Step 10: Set PATH to include .dotnet/tools
-ENV PATH="$PATH:/root/.dotnet/tools:/home/jovyan/.dotnet/tools"
+# Step 10: Set PATH to include .dotnet/tools for both root and jovyan users
+ENV PATH="/usr/share/dotnet:${PATH}"
 
 # Step 11: Ensure dotnet-interactive is installed
 RUN dotnet-interactive --version
