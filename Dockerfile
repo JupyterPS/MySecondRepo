@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     libssl-dev \
     git \
+    sudo \
     && curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n \
     && chmod +x /usr/local/bin/n \
     && n 14.17.0 \
@@ -88,8 +89,11 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
 # Step 23: Set permissions for dotnet commands
 RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
 
-# Step 24: Switch back to jovyan user
+# Step 24: Add jovyan to sudoers
+RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# Step 25: Switch back to jovyan user
 USER jovyan
 
-# Step 25: Final working directory
+# Step 26: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
