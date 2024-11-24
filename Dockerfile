@@ -1,6 +1,6 @@
 # Step 1: Start from the official .NET SDK image
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS dotnet
-
+ 
 # Step 2: Create a new base image from the Jupyter base-notebook
 FROM jupyter/base-notebook:latest
 
