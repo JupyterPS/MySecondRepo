@@ -107,3 +107,9 @@ RUN sudo dotnet --info
 
 # Step 28: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
+
+# Step 29: Copy Jupyter configuration
+COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
+
+# Step 30: Copy Kernel Gateway configuration
+COPY kernel_gateway_config.py /home/jovyan/.jupyter/kernel_gateway_config.py
