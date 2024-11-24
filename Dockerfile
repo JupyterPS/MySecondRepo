@@ -93,8 +93,8 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
     apt-get update && \
     apt-get install -y powershell
 
-# Step 24: Set permissions for dotnet commands
-RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
+# Step 24: Install jupyter-kernel-gateway
+RUN python3 -m pip install jupyter-kernel-gateway
 
 # Step 25: Add jovyan to sudoers
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
