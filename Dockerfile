@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     git \
     sudo \
-    && curl -L <https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n> \
+    && curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n \
     && chmod +x /usr/local/bin/n \
     && n 14.17.0 \
     && python3 -m pip install --upgrade pip \
