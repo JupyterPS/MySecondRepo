@@ -24,10 +24,10 @@ RUN apt-get update && apt-get install -y \
     && chmod +x /usr/local/bin/n \
     && n 14.17.0 \
     && python3 -m pip install --upgrade pip \
-    && python3 -m pip install notebook numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose
+    && python3 -m pip install --upgrade notebook numpy spotipy scipy matplotlib ipython jupyter pandas sympy nose
 
 # Step 6: Install JupyterLab separately to avoid memory issues
-RUN python3 -m pip install jupyterlab
+RUN python3 -m pip install --upgrade jupyterlab
 
 # Step 7: Install .NET Runtime 3.1 using the official installation script
 RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 3.1 --install-dir /usr/share/dotnet
@@ -61,17 +61,17 @@ RUN mkdir -p /home/jovyan/.dotnet/tools && \
     chown -R jovyan:users /home/jovyan/.dotnet
 
 # Step 16: Install nteract for Jupyter
-RUN python3 -m pip install nteract_on_jupyter
+RUN python3 -m pip install --upgrade nteract_on_jupyter
 
 # Step 17: Enable telemetry
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
 # Step 18: Install JupyterLab git extension using pip as root
 USER root
-RUN python3 -m pip install jupyterlab-git
+RUN python3 -m pip install --upgrade jupyterlab-git
 
 # Step 19: Install JupyterLab GitHub extension using pip as root
-RUN python3 -m pip install jupyterlab_github
+RUN python3 -m pip install --upgrade jupyterlab_github
 
 # Step 20: Add Microsoft repository and install PowerShell
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
