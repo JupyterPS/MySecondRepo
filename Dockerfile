@@ -51,9 +51,9 @@ RUN dotnet-interactive jupyter install
 WORKDIR /home/jovyan
 
 # Step 14: Copy configuration files and notebooks with correct ownership
-COPY --chown=root:root ./config /home/jovyan/.jupyter/
-COPY --chown=root:root ./ /home/jovyan/WindowsPowerShell/
-COPY --chown=root:root ./NuGet.config /home/jovyan/nuget.config
+COPY --chown=jovyan:users ./config /home/jovyan/.jupyter/
+COPY --chown=jovyan:users ./ /home/jovyan/WindowsPowerShell/
+COPY --chown=jovyan:users ./NuGet.config /home/jovyan/nuget.config
 
 # Step 15: Ensure permissions for .dotnet/tools directory
 RUN mkdir -p /home/jovyan/.dotnet/tools && \
@@ -67,6 +67,7 @@ RUN python3 -m pip install nteract_on_jupyter
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
 # Step 18: Install JupyterLab git extension using pip as root
+USER root
 RUN python3 -m pip install jupyterlab-git
 
 # Step 19: Install JupyterLab GitHub extension using pip as root
@@ -78,11 +79,8 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
     apt-get update && \
     apt-get install -y powershell
 
-# Step 21: Switch to jovyan user
+# Step 21: Switch back to jovyan user
 USER jovyan
 
-# Step 22: Ensure ownership of all necessary directories
-RUN chown -R jovyan:users /home/jovyan
-
-# Step 23: Final working directory
+# Step 22: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
