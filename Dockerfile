@@ -85,8 +85,12 @@ RUN mkdir -p /home/jovyan/.dotnet/tools && \
     chmod -R 755 /home/jovyan/.dotnet && \
     chown -R jovyan:users /home/jovyan/.dotnet
 
-# Step 22: Ensure proper permissions for dotnet command
-RUN chmod +x /usr/share/dotnet/dotnet
+# Step 22: Switch to root user and set permissions for dotnet command with --force
+USER root
+RUN chmod +x /usr/share/dotnet/dotnet --force
 
-# Step 23: Final working directory
+# Step 23: Switch back to jovyan user
+USER jovyan
+
+# Step 24: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
