@@ -56,13 +56,15 @@ RUN dotnet-interactive jupyter install
 # Step 15: Set the working directory
 WORKDIR /home/jovyan
 
-# Step 16: Copy configuration files and notebooks
-COPY ./config /home/jovyan/.jupyter/
-COPY ./ /home/jovyan/WindowsPowerShell/
-COPY ./NuGet.config /home/jovyan/nuget.config
+# Step 16: Copy configuration files and notebooks with correct ownership
+COPY --chown=jovyan:users ./config /home/jovyan/.jupyter/
+COPY --chown=jovyan:users ./ /home/jovyan/WindowsPowerShell/
+COPY --chown=jovyan:users ./NuGet.config /home/jovyan/nuget.config
 
-# Step 17: Change ownership to jovyan user
-RUN chown -R jovyan:users /home/jovyan
+# Step 17: Ensure permissions for .dotnet/tools directory
+RUN mkdir -p /home/jovyan/.dotnet/tools && \
+    chmod -R 755 /home/jovyan/.dotnet && \
+    chown -R jovyan:users /home/jovyan/.dotnet
 
 # Step 18: Install nteract for Jupyter
 RUN python3 -m pip install nteract_on_jupyter
@@ -71,13 +73,13 @@ RUN python3 -m pip install nteract_on_jupyter
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
 # Step 20: Install JupyterLab git extension using pip as root
+USER root
 RUN python3 -m pip install jupyterlab-git
 
 # Step 21: Install JupyterLab GitHub extension using pip as root
 RUN python3 -m pip install jupyterlab_github
 
 # Step 22: Add Microsoft repository and install PowerShell
-USER root
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
