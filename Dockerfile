@@ -1,6 +1,6 @@
 # Step 1: Start from the official .NET SDK image
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS dotnet
- 
+
 # Step 2: Create a new base image from the Jupyter base-notebook
 FROM jupyter/base-notebook:latest
 
@@ -93,23 +93,17 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
     apt-get update && \
     apt-get install -y powershell
 
-# Step 24: Install jupyter-kernel-gateway
-RUN python3 -m pip install jupyter-kernel-gateway
-
-# Step 25: Add jovyan to sudoers
+# Step 24: Add jovyan to sudoers
 RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# Step 26: Switch back to jovyan user
+# Step 25: Switch back to jovyan user
 USER jovyan
 
-# Step 27: Test dotnet command
+# Step 26: Test dotnet command
 RUN sudo dotnet --info
 
-# Step 28: Final working directory
+# Step 27: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
 
-# Step 29: Copy Jupyter configuration
+# Step 28: Copy Jupyter configuration
 COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
-
-# Step 30: Copy Kernel Gateway configuration
-COPY kernel_gateway_config.py /home/jovyan/.jupyter/kernel_gateway_config.py
