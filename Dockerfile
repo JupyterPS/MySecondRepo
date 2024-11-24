@@ -35,10 +35,10 @@ RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 3.
 # Step 8: Install .NET Runtime 6.0 using the official installation script
 RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --install-dir /usr/share/dotnet
 
-# Step 9: Set correct permissions and ownership for dotnet
+# Step 9: Ensure correct permissions and ownership for dotnet
 RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
 
-# Step 10: Switch back to jovyan user to install dotnet tools
+# Step 10: Switch to jovyan user for dotnet tool installation
 USER jovyan
 
 # Step 11: Install .NET Interactive tool
@@ -85,8 +85,11 @@ RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-p
     apt-get update && \
     apt-get install -y powershell
 
-# Step 23: Switch back to jovyan user
+# Step 23: Set permissions for dotnet commands
+RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
+
+# Step 24: Switch back to jovyan user
 USER jovyan
 
-# Step 24: Final working directory
+# Step 25: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
