@@ -35,61 +35,58 @@ RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 3.
 # Step 8: Install .NET Runtime 6.0 using the official installation script
 RUN curl -SL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 6.0 --install-dir /usr/share/dotnet
 
-# Step 9: Set correct permissions and ownership for dotnet
-RUN chmod -R 755 /usr/share/dotnet && chown -R jovyan:users /usr/share/dotnet
-
-# Step 10: Switch back to jovyan user to install dotnet tools
-USER jovyan
-
-# Step 11: Install .NET Interactive tool
+# Step 9: Install .NET Interactive tool
 RUN /usr/share/dotnet/dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302
 
-# Step 12: Set PATH to include .dotnet/tools
+# Step 10: Set PATH to include .dotnet/tools
 ENV PATH="$PATH:/root/.dotnet/tools:/home/jovyan/.dotnet/tools"
 
-# Step 13: Ensure dotnet-interactive is installed
+# Step 11: Ensure dotnet-interactive is installed
 RUN dotnet-interactive --version
 
-# Step 14: Install the .NET Interactive kernels (including PowerShell)
+# Step 12: Install the .NET Interactive kernels (including PowerShell)
 RUN dotnet-interactive jupyter install
 
-# Step 15: Set the working directory
+# Step 13: Set the working directory
 WORKDIR /home/jovyan
 
-# Step 16: Copy configuration files and notebooks with correct ownership
+# Step 14: Copy configuration files and notebooks with correct ownership
 COPY --chown=jovyan:users ./config /home/jovyan/.jupyter/
 COPY --chown=jovyan:users ./ /home/jovyan/WindowsPowerShell/
 COPY --chown=jovyan:users ./NuGet.config /home/jovyan/nuget.config
 
-# Step 17: Ensure permissions for .dotnet/tools directory
+# Step 15: Ensure permissions for .dotnet/tools directory
 RUN mkdir -p /home/jovyan/.dotnet/tools && \
     chmod -R 755 /home/jovyan/.dotnet && \
     chown -R jovyan:users /home/jovyan/.dotnet
 
-# Step 18: Install nteract for Jupyter
+# Step 16: Install nteract for Jupyter
 RUN python3 -m pip install nteract_on_jupyter
 
-# Step 19: Enable telemetry
+# Step 17: Enable telemetry
 ENV DOTNET_TRY_CLI_TELEMETRY_OPTOUT=false
 
-# Step 20: Install JupyterLab git extension using pip as root
+# Step 18: Install JupyterLab git extension using pip as root
 USER root
 RUN python3 -m pip install jupyterlab-git
 
-# Step 21: Install JupyterLab GitHub extension using pip as root
+# Step 19: Install JupyterLab GitHub extension using pip as root
 RUN python3 -m pip install jupyterlab_github
 
-# Step 22: Add Microsoft repository and install PowerShell
+# Step 20: Add Microsoft repository and install PowerShell
 RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     apt-get update && \
     apt-get install -y powershell
 
-# Step 23: Set correct permissions and ownership for .dotnet/tools directory
+# Step 21: Set correct permissions and ownership for .dotnet/tools directory
 USER jovyan
 RUN mkdir -p /home/jovyan/.dotnet/tools && \
     chmod -R 755 /home/jovyan/.dotnet && \
     chown -R jovyan:users /home/jovyan/.dotnet
 
-# Step 24: Final working directory
+# Step 22: Ensure proper permissions for dotnet command
+RUN chmod +x /usr/share/dotnet/dotnet
+
+# Step 23: Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
