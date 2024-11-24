@@ -46,16 +46,17 @@ USER jovyan
 RUN /usr/share/dotnet/dotnet tool install --global Microsoft.dotnet-interactive --version 1.0.155302
 
 # Step 12: Add .dotnet/tools to PATH for jovyan user
-ENV PATH="/home/jovyan/.dotnet/tools:${PATH}"
+ENV PATH="/home/jovyan/.dotnet/tools:/usr/share/dotnet:${PATH}"
 
 # Step 13: Verify dotnet and dotnet-interactive installations
 RUN echo $PATH
 RUN ls -la /home/jovyan/.dotnet/tools
-RUN dotnet --info
-RUN dotnet-interactive --version
+RUN ls -la /usr/share/dotnet
+RUN /home/jovyan/.dotnet/tools/dotnet-interactive --version
+RUN /usr/share/dotnet/dotnet --info
 
 # Step 14: Install the .NET Interactive kernels (including PowerShell)
-RUN dotnet-interactive jupyter install
+RUN /home/jovyan/.dotnet/tools/dotnet-interactive jupyter install
 
 # Step 15: Set the working directory
 WORKDIR /home/jovyan
