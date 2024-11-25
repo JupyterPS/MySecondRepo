@@ -102,7 +102,7 @@ RUN echo "jovyan ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Step 26: Switch back to jovyan user
 USER jovyan
-
+ 
 # Step 27: Test dotnet command
 RUN sudo dotnet --info
 
