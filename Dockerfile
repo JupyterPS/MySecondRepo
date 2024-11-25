@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     git \
     sudo \
-    && curl -L <https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n> \
+    && curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n \
     && chmod +x /usr/local/bin/n \
     && n 14.17.0 \
     && python3 -m pip install --upgrade pip \
@@ -123,4 +123,4 @@ RUN mkdir -p /home/jovyan/.jupyter && \
 CMD tail -f /home/jovyan/.jupyter/jupyter.log
 
 # Step 31: Run Jupyter Notebook and ensure logs capture kernel activity
-CMD jupyter notebook --allow-root --no-browser --ip=0.0.0.0 --port=8888 --NotebookApp.log_level=DEBUG --NotebookApp.log_file=/home/jovyan/.jupyter/jupyter.log 
+CMD jupyter notebook --allow-root --no-browser --ip=0.0.0.0 --port=8888 --NotebookApp.log_level=DEBUG --NotebookApp.log_file=/home/jovyan/.jupyter/jupyter.log
