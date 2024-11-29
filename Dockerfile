@@ -102,12 +102,9 @@ USER jovyan
 # Step 26: Test dotnet command
 RUN sudo dotnet --info
 
-# Step 27: Final working directory
+# Final working directory
 WORKDIR /home/jovyan/WindowsPowerShell/
-
-# Step 28: Add logging configuration
-RUN mkdir -p /home/jovyan/.jupyter && \
-    echo "c.NotebookApp.log_level = 'DEBUG'" > /home/jovyan/.jupyter/jupyter_notebook_config.py
+RUN mkdir -p /home/jovyan/.jupyter && echo "c.NotebookApp.log_level = 'DEBUG'" > /home/jovyan/.jupyter/jupyter_notebook_config.py
 
 # Step 29: Add a command to view logs after start
 CMD tail -f /home/jovyan/.jupyter/jupyter.log
