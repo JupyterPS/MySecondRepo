@@ -116,5 +116,4 @@ RUN pip install powershell_kernel
 RUN python -m powershell_kernel.install
 
 # Step 31: Verify kernel installations (Optional)
-RUN jupyter kernelspec list
-
+RUN jupyter kernelspec li
