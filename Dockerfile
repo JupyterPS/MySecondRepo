@@ -6,7 +6,7 @@ FROM jupyter/base-notebook:latest
 
 # Step 3: Switch to root user to install additional dependencies
 USER root
-
+ 
 # Step 4: Clear Docker cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
